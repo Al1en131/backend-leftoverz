@@ -12,7 +12,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Users', // Asumsi Anda memiliki model Users untuk relasi
+      model: 'Users', 
       key: 'id'
     }
   },
@@ -49,8 +49,8 @@ const Product = sequelize.define('Product', {
     defaultValue: DataTypes.NOW
   }
 }, {
-  tableName: 'products', // Nama tabel di database
-  timestamps: false // Karena sudah ada field created_at yang digunakan
+  tableName: 'products',
+  timestamps: false 
 });
 
 module.exports = Product;
