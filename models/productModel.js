@@ -26,18 +26,16 @@ const Product = sequelize.define('Product', {
     defaultValue: null
   },
   price: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.INTEGER,
     allowNull: false
-  },
-  category: {
-    type: DataTypes.STRING(100),
-    allowNull: true,
-    defaultValue: null
   },
   location: {
     type: DataTypes.STRING(100),
     allowNull: true,
     defaultValue: null
+  },
+  image: {
+    type: DataTypes.JSON, // atau DataTypes.STRING jika menyimpan path tunggal
   },
   status: {
     type: DataTypes.ENUM('available', 'sold'),

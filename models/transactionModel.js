@@ -22,7 +22,7 @@ const Transaction = sequelize.define(
       allowNull: false,
     },
     total_price: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     payment_method: {
