@@ -134,6 +134,24 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const countProducts = async (req, res) => {
+  try {
+    const totalProducts = await Product.count();
+
+    res.status(200).json({
+      message: "Total product count retrieved successfully",
+      count: totalProducts,
+    });
+  } catch (error) {
+    console.error("Error counting products:", error);
+    res.status(500).json({
+      message: "Error counting products",
+      error: error.message,
+    });
+  }
+};
+
+
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -199,5 +217,6 @@ module.exports = {
   uploadMiddleware,
   editProduct,
   getProductById,
-  deleteProduct
+  deleteProduct,
+  countProducts
 };

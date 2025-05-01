@@ -43,7 +43,24 @@ const getAllTransactions = async (req, res) => {
     });
   }
 };
+const countTransactions = async (req, res) => {
+  try {
+    const totalTransactions = await Transaction.count();
+
+    res.status(200).json({
+      message: "Total product count retrieved successfully",
+      count: totalTransactions,
+    });
+  } catch (error) {
+    console.error("Error counting Transactions:", error);
+    res.status(500).json({
+      message: "Error counting Transactions",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
-  getAllTransactions
+  getAllTransactions,
+  countTransactions
 };

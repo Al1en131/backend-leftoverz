@@ -5,6 +5,7 @@ const users = require("./userRoutes");
 const products = require("./productRoutes");
 const Transaction = require("./transactionRoutes");
 const chat = require("./chatRoutes");
+const dashboard = require("./dashboardRoutes");
 
 const apiUrl = "/api/v1";
 
@@ -12,5 +13,6 @@ app.use(apiUrl, users);
 app.use(apiUrl, products);
 app.use(apiUrl, Transaction);
 app.use(apiUrl, chat);
+app.use(apiUrl, dashboard);
 
 module.exports = app;
