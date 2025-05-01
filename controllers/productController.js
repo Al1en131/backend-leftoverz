@@ -18,8 +18,8 @@ const createProduct = async (req, res) => {
     return res.status(400).json({ message: "No files uploaded. Please upload at least one image." });
   }
 
-  const { name, price, location, description, user_id, status } = req.body;
-  if (!name || !price || !location || !description || !user_id || !status) {
+  const { name, price, description, user_id, status } = req.body;
+  if (!name || !price || !description || !user_id || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
@@ -29,7 +29,6 @@ const createProduct = async (req, res) => {
     const newProduct = await Product.create({
       name,
       price,
-      location,
       description,
       user_id,
       status,
@@ -59,10 +58,10 @@ const uploadMiddleware = (req, res, next) => {
 
 const editProduct = async (req, res) => {
   const { id } = req.params; // Mengambil id product dari parameter URL
-  const { name, price, location, description, user_id, status } = req.body;
+  const { name, price, description, user_id, status } = req.body;
 
   // Validasi input
-  if (!name || !price || !location || !description || !user_id || !status) {
+  if (!name || !price || !description || !user_id || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
@@ -77,7 +76,6 @@ const editProduct = async (req, res) => {
     // Mengupdate product dengan data baru
     product.name = name;
     product.price = price;
-    product.location = location;
     product.description = description;
     product.user_id = user_id;
     product.status = status;

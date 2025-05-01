@@ -29,11 +29,6 @@ const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  location: {
-    type: DataTypes.STRING(100),
-    allowNull: true,
-    defaultValue: null
-  },
   image: {
     type: DataTypes.JSON, // atau DataTypes.STRING jika menyimpan path tunggal
   },

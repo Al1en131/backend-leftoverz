@@ -18,7 +18,7 @@ const getAllTransactions = async (req, res) => {
         {
           model: Product,
           as: 'item',
-          attributes: ['id', 'name', 'price']
+          attributes: ['id', 'name', 'price', 'image']
         }
       ]
     });

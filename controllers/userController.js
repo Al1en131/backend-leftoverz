@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const bcrypt = require('bcrypt');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -55,9 +56,17 @@ const getUserById = async (req, res) => {
     });
   }
 };
+const saltRounds = 10; // Jumlah salt untuk bcrypt (semakin tinggi, semakin aman namun lebih lambat)
+
+// Fungsi untuk mengenkripsi password
+const encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt(saltRounds);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+};
 
 const addUser = async (req, res) => {
-  const { name, email, password, role, no_hp } = req.body;
+  const { name, email, password, role, no_hp, address, province, regency, subdistrict, ward } = req.body;
 
   // Validasi data
   if (!name || !email || !password || !role || !no_hp) {
@@ -67,13 +76,21 @@ const addUser = async (req, res) => {
   }
 
   try {
-    // Membuat pengguna baru
+    // Enkripsi password
+    const hashedPassword = await encryptPassword(password);
+
+    // Membuat pengguna baru dengan password terenkripsi
     const newUser = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword,
       role,
       no_hp,
+      address,
+      province,
+      regency,
+      subdistrict,
+      ward
     });
 
     // Mengirimkan response sukses
@@ -89,9 +106,10 @@ const addUser = async (req, res) => {
     });
   }
 };
+
 const updateUser = async (req, res) => {
   const userId = req.params.id;
-  const { name, email, password, role, no_hp } = req.body;
+  const { name, email, password, role, no_hp, address, province, regency, subdistrict, ward } = req.body;
 
   if (!userId) {
     return res.status(400).json({
@@ -108,13 +126,24 @@ const updateUser = async (req, res) => {
       });
     }
 
-    // Update user
+    // Enkripsi password jika diberikan
+    let hashedPassword = user.password;
+    if (password) {
+      hashedPassword = await encryptPassword(password);
+    }
+
+    // Update user dengan password yang sudah terenkripsi
     await user.update({
       name: name ?? user.name,
       email: email ?? user.email,
-      password: password ?? user.password,
+      password: hashedPassword,
       role: role ?? user.role,
       no_hp: no_hp ?? user.no_hp,
+      address: address ?? user.address,
+      province : province ?? user.province,
+      regency : regency ?? user.regency,
+      subdistrict : subdistrict ?? user.subdistrict,
+      ward : ward ?? user.ward
     });
 
     return res.status(200).json({
@@ -129,6 +158,7 @@ const updateUser = async (req, res) => {
     });
   }
 };
+
 
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
