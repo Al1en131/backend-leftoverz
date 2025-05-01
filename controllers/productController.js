@@ -160,10 +160,46 @@ const getProductById = async (req, res) => {
   }
 };
 
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Cari produk berdasarkan ID
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // (Opsional) Hapus file gambar dari sistem file
+    const fs = require('fs');
+    if (product.image && Array.isArray(product.image)) {
+      product.image.forEach((imgPath) => {
+        const filePath = path.join(__dirname, '..', imgPath);
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.warn(`Failed to delete image: ${imgPath}`, err.message);
+          }
+        });
+      });
+    }
+
+    // Hapus produk dari database
+    await product.destroy();
+
+    return res.status(200).json({ message: "Product deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return res.status(500).json({ message: "Error deleting product, please try again." });
+  }
+};
+
+
 module.exports = {
   getAllProducts,
   createProduct,
   uploadMiddleware,
   editProduct,
-  getProductById
+  getProductById,
+  deleteProduct
 };
