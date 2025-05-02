@@ -85,18 +85,15 @@ const editProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // Update data dasar
     product.name = name;
     product.price = price;
     product.description = description;
     product.user_id = user_id;
     product.status = status;
 
-    // Parse removedImages (dikirim dari frontend dalam bentuk string JSON)
     const removedList = JSON.parse(removedImages);
     let currentImages = Array.isArray(product.image) ? product.image : [];
 
-    // Hapus file gambar yang ingin dihapus dari server & array
     removedList.forEach((img) => {
       const filePath = path.join(__dirname, `../public${img}`);
       try {
@@ -109,13 +106,11 @@ const editProduct = async (req, res) => {
       }
     });
 
-    // Tambahkan gambar baru (jika ada)
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
       currentImages.push(...newImages);
     }
 
-    // Update gambar dan simpan
     product.image = currentImages;
     await product.save();
 
@@ -136,7 +131,16 @@ const getAllProducts = async (req, res) => {
     const products = await Product.findAll({
       include: {
         model: User,
-        attributes: ["id", "name", "email"],
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "subdistrict",
+          "ward",
+          "regency",
+          "province",
+          "address",
+        ],
       },
     });
 
@@ -148,8 +152,13 @@ const getAllProducts = async (req, res) => {
 
     const productsData = products.map((product) => {
       const productJSON = product.toJSON();
-      productJSON.seller = productJSON.User; // Rename User to seller
-      delete productJSON.User; // Optional
+      productJSON.seller = {
+        name: productJSON.User.name,
+      };
+      productJSON.user = {
+        subdistrict: productJSON.User.subdistrict,
+      };
+      delete productJSON.User;
       return productJSON;
     });
 
