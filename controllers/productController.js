@@ -254,6 +254,64 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getProductDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByPk(id, {
+      include: [
+        {
+          model: User,
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "subdistrict",
+            "ward",
+            "regency",
+            "province",
+            "address",
+          ],
+        },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    const productJSON = product.toJSON();
+    productJSON.seller = {
+      name: productJSON.User.name,
+    };
+    productJSON.user = {
+      subdistrict: productJSON.User.subdistrict,
+      ward: productJSON.User.ward,
+      regency: productJSON.User.regency,
+      province: productJSON.User.province,
+      address: productJSON.User.address,
+    };
+    delete productJSON.User;
+
+    res.status(200).json({
+      success: true,
+      message: "Product retrieved successfully",
+      product: productJSON,
+    });
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   getAllProducts,
   createProduct,
@@ -262,4 +320,5 @@ module.exports = {
   getProductById,
   deleteProduct,
   countProducts,
+  getProductDetail
 };

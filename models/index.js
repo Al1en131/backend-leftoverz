@@ -2,6 +2,7 @@ const User = require('./userModel');
 const Product = require('./productModel');
 const Transaction = require('./transactionModel');
 const Chat = require('./chatModel');
+const Favorite = require('./favoriteModel')
 
 const db = {
   User,
@@ -33,5 +34,17 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
+
+Favorite.associate = (models) => {
+  Favorite.belongsTo(models.User, {
+    foreignKey: "user_id",
+    as: "user", // Alias untuk asosiasi ke tabel User
+  });
+
+  Favorite.belongsTo(models.Product, {
+    foreignKey: "item_id",
+    as: "product", // Alias untuk asosiasi ke tabel Product
+  });
+};
 
 module.exports = db;
