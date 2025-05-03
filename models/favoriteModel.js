@@ -24,7 +24,7 @@ const Favorite = sequelize.define(
     },
   },
   {
-    timestamps: true, // Menyimpan kolom createdAt dan updatedAt
+    timestamps: false, // Menyimpan kolom createdAt dan updatedAt
     tableName: "favorites", // Nama tabel di database
   }
 );
