@@ -9,7 +9,7 @@ const db = {
   Product,
   Transaction,
   Chat,
-  Favorite
+  Favorite,
 };
 
 // Relasi manual (bisa juga didefinisikan via .associate di masing-masing model)
@@ -28,14 +28,6 @@ Transaction.belongsTo(Product, { foreignKey: "item_id", as: "item" });
 Chat.belongsTo(User, { as: "sender", foreignKey: "sender_id" });
 Chat.belongsTo(User, { as: "receiver", foreignKey: "receiver_id" });
 Chat.belongsTo(Product, { foreignKey: "item_id" });
-
-// Atau kalau masing-masing model punya Chat.associate:
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
-
 Favorite.associate = (models) => {
   Favorite.belongsTo(models.User, {
     foreignKey: "user_id",
@@ -44,11 +36,18 @@ Favorite.associate = (models) => {
 
   Favorite.belongsTo(models.Product, {
     foreignKey: "item_id",
-    as: "product",
+    as: "product", // Pastikan alias 'product' sesuai
   });
 };
-Product.hasMany(Favorite, { foreignKey: "item_id" });
 
+Product.hasOne(Favorite, { foreignKey: "item_id" });
 User.hasMany(Favorite, { foreignKey: "user_id" });
+
+// Atau kalau masing-masing model punya Chat.associate:
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
 module.exports = db;

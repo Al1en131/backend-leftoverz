@@ -1,4 +1,4 @@
-const { User, Product, Favorite } = require("../models");
+const { Favorite, User, Product } = require("../models"); // Pastikan model sudah di-import dengan benar
 
 async function handleCreateFavorite(req, res) {
   try {
@@ -86,4 +86,86 @@ const removeFavorite = async (req, res) => {
   }
 };
 
-module.exports = { handleCreateFavorite, getFavoriteStatus, removeFavorite };
+const getAllFavoritesByUserId = async (req, res) => {
+  const { user_id } = req.params; // Mengambil user_id dari params
+
+  try {
+    // Cek apakah user ada di database
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    console.log("Mencari favorit untuk user_id:", user_id);
+
+    const favorites = await Favorite.findAll({
+      where: { user_id: user_id },
+      include: [
+        {
+          model: Product,
+          as: "product", // Alias yang harus sesuai dengan asosiasi di model Favorite
+          attributes: ["id", "name", "price", "image"], // Pastikan image termasuk dalam atribut
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: [
+            "id",
+            "name",
+            "subdistrict",
+            "regency",
+            "ward",
+            "province",
+          ],
+        },
+      ],
+    });
+
+    console.log("Favorites ditemukan:", favorites);
+
+    // Jika tidak ada favorit ditemukan
+    if (favorites.length === 0) {
+      return res.status(404).json({ message: "Tidak ada favorit ditemukan" });
+    }
+
+    // Menyusun data untuk response
+    const result = favorites.map((fav) => {
+      const product = fav.product; // Produk terkait dari Favorite
+      const user = fav.user; // User terkait dari Favorite
+
+      return {
+        product: {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          // Pastikan field image diterima dan disusun dengan benar, misalnya
+          image: product.image ? `${product.image}` : null, // Menangani kemungkinan null atau string array
+        },
+        user: {
+          name: user.name, // Ambil nama user
+          subdistrict: user.subdistrict,
+          ward: user.ward,
+          regency: user.regency,
+          province: user.province,
+        },
+      };
+    });
+
+    return res.status(200).json({
+      message: "Berhasil mendapatkan data favorit",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Gagal mendapatkan data favorit:", error); // Logging error untuk debugging
+    return res
+      .status(500)
+      .json({ message: "Terjadi kesalahan pada server", error: error.message });
+  }
+};
+
+module.exports = {
+  handleCreateFavorite,
+  getFavoriteStatus,
+  removeFavorite,
+  getAllFavoritesByUserId,
+};
