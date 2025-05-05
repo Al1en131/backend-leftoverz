@@ -42,6 +42,8 @@ Favorite.associate = (models) => {
 
 Product.hasOne(Favorite, { foreignKey: "item_id" });
 User.hasMany(Favorite, { foreignKey: "user_id" });
+Product.belongsTo(User, { as: 'owner', foreignKey: 'user_id' });
+
 
 // Atau kalau masing-masing model punya Chat.associate:
 Object.keys(db).forEach((modelName) => {

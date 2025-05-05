@@ -104,7 +104,13 @@ const getAllFavoritesByUserId = async (req, res) => {
         {
           model: Product,
           as: "product", // Alias yang harus sesuai dengan asosiasi di model Favorite
-          attributes: ["id", "name", "price", "image"], // Pastikan image termasuk dalam atribut
+          attributes: ["id", "user_id", "name", "price", "image"], // Pastikan image termasuk dalam atribut
+          include: [
+            {
+              model: User,
+              attributes: ["id", "name", "subdistrict"], // Ambil nama penjual
+            },
+          ],
         },
         {
           model: User,
@@ -130,6 +136,7 @@ const getAllFavoritesByUserId = async (req, res) => {
 
     // Menyusun data untuk response
     const result = favorites.map((fav) => {
+      const seller = fav.product.User;
       const product = fav.product; // Produk terkait dari Favorite
       const user = fav.user; // User terkait dari Favorite
 
@@ -138,7 +145,9 @@ const getAllFavoritesByUserId = async (req, res) => {
           id: product.id,
           name: product.name,
           price: product.price,
-          // Pastikan field image diterima dan disusun dengan benar, misalnya
+          user_id: product.user_id,
+          seller_name: seller ? seller.name : null,
+          subdistrict: seller ? seller.subdistrict : null,
           image: product.image ? `${product.image}` : null, // Menangani kemungkinan null atau string array
         },
         user: {
