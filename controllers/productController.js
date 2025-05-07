@@ -499,6 +499,71 @@ const editProductByUserId = async (req, res) => {
   }
 };
 
+const getProductByUserIdAndProductId = async (req, res) => {
+  const { user_id, product_id } = req.params;
+
+  if (!user_id || !product_id) {
+    return res.status(400).json({
+      message: "User ID and Product ID are required.",
+    });
+  }
+
+  try {
+    const product = await Product.findOne({
+      where: {
+        id: product_id,
+        user_id,
+      },
+      include: [
+        {
+          model: User,
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "subdistrict",
+            "ward",
+            "regency",
+            "province",
+            "address",
+          ],
+        },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found or does not belong to the user.",
+      });
+    }
+
+    const productJSON = product.toJSON();
+    productJSON.seller = {
+      name: productJSON.User.name,
+    };
+    productJSON.user = {
+      subdistrict: productJSON.User.subdistrict,
+      ward: productJSON.User.ward,
+      regency: productJSON.User.regency,
+      province: productJSON.User.province,
+      address: productJSON.User.address,
+    };
+    delete productJSON.User;
+
+    return res.status(200).json({
+      message: "Product retrieved successfully",
+      product: productJSON,
+    });
+  } catch (error) {
+    console.error("Error fetching product by user_id and product_id:", error.message);
+    return res.status(500).json({
+      message: "An error occurred while retrieving the product",
+      error: error.message,
+    });
+  }
+};
+
+
 
 module.exports = {
   getProductsByUserId,
@@ -511,5 +576,6 @@ module.exports = {
   deleteProduct,
   countProducts,
   getProductDetail,
-  editProductByUserId
+  editProductByUserId,
+  getProductByUserIdAndProductId
 };

@@ -14,6 +14,7 @@ const {
   getProductsByUserId,
   addProductByUserId,
   editProductByUserId,
+  getProductByUserIdAndProductId,
 } = require("../controllers/productController");
 
 routes.get("/products", authMiddleware, getAllProducts);
@@ -31,11 +32,11 @@ routes.post(
   addProductByUserId
 );
 routes.put(
-    "/products/edit/user/:user_id/:product_id",
-    uploadMiddleware,
-    authMiddleware,
-    editProductByUserId
-  );
-  
+  "/products/edit/user/:user_id/:product_id",
+  uploadMiddleware,
+  authMiddleware,
+  editProductByUserId
+);
+routes.get("/products/get/:user_id/:product_id", getProductByUserIdAndProductId);
 
 module.exports = routes;
