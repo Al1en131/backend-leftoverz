@@ -21,7 +21,7 @@ User.hasMany(Transaction, { foreignKey: "seller_id", as: "sales" });
 Transaction.belongsTo(User, { foreignKey: "buyer_id", as: "buyer" });
 Transaction.belongsTo(User, { foreignKey: "seller_id", as: "seller" });
 
-Product.hasMany(Transaction, { foreignKey: "item_id", as: "transactions" });
+Product.hasOne(Transaction, { foreignKey: "item_id", as: "transactions" });
 Transaction.belongsTo(Product, { foreignKey: "item_id", as: "item" });
 
 // Relasi Chat
