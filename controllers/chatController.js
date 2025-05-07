@@ -146,9 +146,52 @@ const readMessage = async (req, res) => {
   }
 };
 
+const sendMessage = async (req, res) => {
+  const { receiver_id, item_id, message } = req.body;
+  const sender_id = req.params.userId; // Mendapatkan sender_id dari URL params
+
+  // Log for debugging
+  console.log("Sender ID:", sender_id, "Receiver ID:", receiver_id);
+
+  try {
+    // Validasi parameter input
+    if (!receiver_id || !item_id || !message) {
+      return res.status(400).json({ message: "Data tidak lengkap" });
+    }
+
+    // Pastikan receiver_id dan sender_id adalah tipe yang sama (misalnya keduanya adalah string)
+    if (String(sender_id) === String(receiver_id)) {
+      return res
+        .status(400)
+        .json({ message: "Tidak bisa mengirim pesan ke diri sendiri" });
+    }
+
+    // Buat pesan baru
+    const newMessage = await Chat.create({
+      sender_id,
+      receiver_id,
+      item_id,
+      message,
+      read_status: "0", // Status awal pesan adalah belum dibaca
+    });
+
+    // Kirim response sukses
+    return res.status(201).json({
+      message: "Pesan berhasil dikirim",
+      chat: newMessage,
+    });
+  } catch (error) {
+    console.error("Error sending message:", error.message || error.stack);
+    return res
+      .status(500)
+      .json({ message: "Terjadi kesalahan saat mengirim pesan" });
+  }
+};
+
 module.exports = {
   getAllChats,
   getChatsByUserId,
   getMessagesBetweenUsers,
   readMessage,
+  sendMessage,
 };
