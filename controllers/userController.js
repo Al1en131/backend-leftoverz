@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -66,7 +66,18 @@ const encryptPassword = async (password) => {
 };
 
 const addUser = async (req, res) => {
-  const { name, email, password, role, no_hp, address, province, regency, subdistrict, ward } = req.body;
+  const {
+    name,
+    email,
+    password,
+    role,
+    no_hp,
+    address,
+    province,
+    regency,
+    subdistrict,
+    ward,
+  } = req.body;
 
   // Validasi data
   if (!name || !email || !password || !role || !no_hp) {
@@ -90,7 +101,7 @@ const addUser = async (req, res) => {
       province,
       regency,
       subdistrict,
-      ward
+      ward,
     });
 
     // Mengirimkan response sukses
@@ -109,7 +120,18 @@ const addUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const userId = req.params.id;
-  const { name, email, password, role, no_hp, address, province, regency, subdistrict, ward } = req.body;
+  const {
+    name,
+    email,
+    password,
+    role,
+    no_hp,
+    address,
+    province,
+    regency,
+    subdistrict,
+    ward,
+  } = req.body;
 
   if (!userId) {
     return res.status(400).json({
@@ -140,10 +162,10 @@ const updateUser = async (req, res) => {
       role: role ?? user.role,
       no_hp: no_hp ?? user.no_hp,
       address: address ?? user.address,
-      province : province ?? user.province,
-      regency : regency ?? user.regency,
-      subdistrict : subdistrict ?? user.subdistrict,
-      ward : ward ?? user.ward
+      province: province ?? user.province,
+      regency: regency ?? user.regency,
+      subdistrict: subdistrict ?? user.subdistrict,
+      ward: ward ?? user.ward,
     });
 
     return res.status(200).json({
@@ -158,7 +180,6 @@ const updateUser = async (req, res) => {
     });
   }
 };
-
 
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
@@ -199,5 +220,5 @@ module.exports = {
   getUserById,
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };
