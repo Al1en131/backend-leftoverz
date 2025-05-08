@@ -17,7 +17,7 @@ const Chat = sequelize.define("Chat", {
     },
     item_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     message: {
       type: DataTypes.TEXT,
