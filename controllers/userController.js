@@ -123,7 +123,6 @@ const updateUser = async (req, res) => {
   const {
     name,
     email,
-    password,
     role,
     no_hp,
     address,
@@ -147,18 +146,9 @@ const updateUser = async (req, res) => {
         message: "User not found",
       });
     }
-
-    // Enkripsi password jika diberikan
-    let hashedPassword = user.password;
-    if (password) {
-      hashedPassword = await encryptPassword(password);
-    }
-
-    // Update user dengan password yang sudah terenkripsi
     await user.update({
       name: name ?? user.name,
       email: email ?? user.email,
-      password: hashedPassword,
       role: role ?? user.role,
       no_hp: no_hp ?? user.no_hp,
       address: address ?? user.address,
