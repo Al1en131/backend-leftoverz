@@ -183,10 +183,94 @@ const sendMessage = async (req, res) => {
   }
 };
 
+const getMessagesByProductId = async (req, res) => {
+  const { productId, user1, user2 } = req.params;
+
+  try {
+    const messages = await Chat.findAll({
+      where: { item_id: productId },
+      include: [
+        {
+          model: User,
+          as: "sender",
+          attributes: ["id", "name"],
+        },
+        {
+          model: User,
+          as: "receiver",
+          attributes: ["id", "name"],
+        },
+        {
+          model: Product,
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [["created_at", "ASC"]],
+    });
+
+    // Filter secara manual berdasarkan kombinasi user1 dan user2
+    const filteredMessages = messages.filter(
+      (msg) =>
+        (String(msg.sender_id) === user1 && String(msg.receiver_id) === user2) ||
+        (String(msg.sender_id) === user2 && String(msg.receiver_id) === user1)
+    );
+
+    return res.status(200).json({
+      message: "Messages retrieved successfully",
+      chats: filteredMessages,
+    });
+  } catch (error) {
+    console.error("Error fetching messages by product:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+const sendMessageByProductId = async (req, res) => {
+  const { message } = req.body;
+  const { productId, user1Id, user2Id } = req.params;
+
+  try {
+    if (!message) {
+      return res.status(400).json({ message: "Pesan tidak boleh kosong" });
+    }
+
+    if (user1Id === user2Id) {
+      return res
+        .status(400)
+        .json({ message: "Tidak bisa mengirim pesan ke diri sendiri" });
+    }
+
+    const newMessage = await Chat.create({
+      sender_id: user1Id,
+      receiver_id: user2Id,
+      item_id: productId,
+      message,
+      read_status: "0",
+    });
+
+    return res.status(201).json({
+      message: "Pesan berhasil dikirim",
+      chat: newMessage,
+    });
+  } catch (error) {
+    console.error("Error sending message by product:", error.message || error.stack);
+    return res
+      .status(500)
+      .json({ message: "Terjadi kesalahan saat mengirim pesan", error: error.message });
+  }
+};
+
+
+
 module.exports = {
+  getMessagesByProductId,
   getAllChats,
   getChatsByUserId,
   getMessagesBetweenUsers,
   readMessage,
   sendMessage,
+  sendMessageByProductId
 };
