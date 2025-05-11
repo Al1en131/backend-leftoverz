@@ -181,7 +181,6 @@ const deleteUser = async (req, res) => {
   }
 
   try {
-    // Cari pengguna berdasarkan ID
     const user = await User.findByPk(userId);
 
     if (!user) {
@@ -190,7 +189,6 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    // Hapus pengguna
     await user.destroy();
 
     return res.status(200).json({
