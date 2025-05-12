@@ -100,6 +100,10 @@ const getMessagesBetweenUsers = async (req, res) => {
           as: "sender",
           attributes: ["id", "name"],
         },
+        {
+          model: Product,
+          attributes : ["id", "name"],
+        }
       ],
       order: [["created_at", "ASC"]],
     });
@@ -147,7 +151,7 @@ const readMessage = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-  const { message } = req.body;
+  const { message, item_id } = req.body;
   const sender_id = req.params.user1Id;
   const receiver_id = req.params.user2Id;
 
@@ -169,6 +173,7 @@ const sendMessage = async (req, res) => {
       receiver_id,
       message,
       read_status: "0",
+      item_id: item_id || null,
     });
 
     return res.status(201).json({
@@ -211,7 +216,8 @@ const getMessagesByProductId = async (req, res) => {
     // Filter secara manual berdasarkan kombinasi user1 dan user2
     const filteredMessages = messages.filter(
       (msg) =>
-        (String(msg.sender_id) === user1 && String(msg.receiver_id) === user2) ||
+        (String(msg.sender_id) === user1 &&
+          String(msg.receiver_id) === user2) ||
         (String(msg.sender_id) === user2 && String(msg.receiver_id) === user1)
     );
 
@@ -256,14 +262,16 @@ const sendMessageByProductId = async (req, res) => {
       chat: newMessage,
     });
   } catch (error) {
-    console.error("Error sending message by product:", error.message || error.stack);
-    return res
-      .status(500)
-      .json({ message: "Terjadi kesalahan saat mengirim pesan", error: error.message });
+    console.error(
+      "Error sending message by product:",
+      error.message || error.stack
+    );
+    return res.status(500).json({
+      message: "Terjadi kesalahan saat mengirim pesan",
+      error: error.message,
+    });
   }
 };
-
-
 
 module.exports = {
   getMessagesByProductId,
@@ -272,5 +280,5 @@ module.exports = {
   getMessagesBetweenUsers,
   readMessage,
   sendMessage,
-  sendMessageByProductId
+  sendMessageByProductId,
 };
