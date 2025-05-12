@@ -63,69 +63,6 @@ const uploadMiddleware = (req, res, next) => {
   });
 };
 
-const editProduct = async (req, res) => {
-  const { id } = req.params;
-  const {
-    name,
-    price,
-    description,
-    user_id,
-    status,
-    removedImages = "[]",
-  } = req.body;
-
-  // Validasi input dasar
-  if (!name || !price || !description || !user_id || !status) {
-    return res.status(400).json({ message: "All fields are required." });
-  }
-
-  try {
-    const product = await Product.findByPk(id);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found." });
-    }
-
-    product.name = name;
-    product.price = price;
-    product.description = description;
-    product.user_id = user_id;
-    product.status = status;
-
-    const removedList = JSON.parse(removedImages);
-    let currentImages = Array.isArray(product.image) ? product.image : [];
-
-    removedList.forEach((img) => {
-      const filePath = path.join(__dirname, `../public${img}`);
-      try {
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-        currentImages = currentImages.filter((x) => x !== img);
-      } catch (err) {
-        console.warn(`Failed to delete ${img}:`, err.message);
-      }
-    });
-
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => `/uploads/${file.filename}`);
-      currentImages.push(...newImages);
-    }
-
-    product.image = currentImages;
-    await product.save();
-
-    return res.status(200).json({
-      message: "Product updated successfully!",
-      product,
-    });
-  } catch (error) {
-    console.error("Error updating product:", error);
-    return res
-      .status(500)
-      .json({ message: "Server error while updating product." });
-  }
-};
-
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.findAll({
@@ -421,6 +358,92 @@ const addProductByUserId = async (req, res) => {
     });
   }
 };
+const editProduct = async (req, res) => {
+  const { id } = req.params;
+  const {
+    name,
+    price,
+    description,
+    user_id,
+    status,
+    removedImages = "[]",
+    keptImages = "[]",
+  } = req.body;
+
+  // Validasi input dasar
+  if (!name || !price || !description || !user_id || !status) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  try {
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Update field utama
+    product.name = name;
+    product.price = price;
+    product.description = description;
+    product.user_id = user_id;
+    product.status = status;
+
+    // Parse image list dari frontend
+    const removedList = JSON.parse(removedImages);
+    const keptList = JSON.parse(keptImages);
+
+    // Hapus file yang dihapus dari server
+    removedList.forEach((img) => {
+      const filePath = path.join(__dirname, `../public${img}`);
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (err) {
+        console.warn(`Failed to delete ${img}:`, err.message);
+      }
+    });
+
+    // Mulai dengan gambar yang ingin dipertahankan
+    let currentImages = keptList;
+
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map((file) => `/uploads/${file.filename}`);
+
+      // Cek total gambar tidak lebih dari 5
+      if (currentImages.length + newImages.length > 5) {
+        // Hapus file upload baru (rollback)
+        newImages.forEach((img) => {
+          const filePath = path.join(__dirname, `../public${img}`);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+
+        return res.status(400).json({
+          message:
+            "A maximum of 5 images is allowed (including existing and new images).",
+        });
+      }
+
+      currentImages.push(...newImages);
+    }
+
+    // Simpan perubahan image
+    product.image = currentImages;
+    await product.save();
+
+    return res.status(200).json({
+      message: "Product updated successfully!",
+      product,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return res.status(500).json({
+      message: "Server error while updating product.",
+    });
+  }
+};
 
 const editProductByUserId = async (req, res) => {
   const { user_id, product_id } = req.params;
@@ -430,6 +453,7 @@ const editProductByUserId = async (req, res) => {
     description,
     status,
     removedImages = "[]",
+    keptImages = "[]",
   } = req.body;
 
   // Validasi data
@@ -453,48 +477,69 @@ const editProductByUserId = async (req, res) => {
     });
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found or not owned by user." });
+      return res
+        .status(404)
+        .json({ message: "Product not found or not owned by user." });
     }
 
+    // Update field utama
     product.name = name;
     product.price = price;
     product.description = description;
     product.status = status;
 
-    // Hapus gambar lama jika diminta
     const removedList = JSON.parse(removedImages);
-    let currentImages = Array.isArray(product.image) ? product.image : [];
+    const keptList = JSON.parse(keptImages);
 
+    // Hapus file yang dihapus dari server
     removedList.forEach((img) => {
       const filePath = path.join(__dirname, `../public${img}`);
       try {
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
-        currentImages = currentImages.filter((x) => x !== img);
       } catch (err) {
         console.warn(`Failed to delete ${img}:`, err.message);
       }
     });
 
-    // Tambah gambar baru jika ada
+    // Mulai dengan gambar yang ingin dipertahankan
+    let currentImages = keptList;
+
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
+
+      // Cek total gambar tidak lebih dari 5
+      if (currentImages.length + newImages.length > 5) {
+        // Hapus file upload baru (rollback)
+        newImages.forEach((img) => {
+          const filePath = path.join(__dirname, `../public${img}`);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+
+        return res.status(400).json({
+          message:
+            "A maximum of 5 images is allowed (including existing and new images).",
+        });
+      }
+
       currentImages.push(...newImages);
     }
 
+    // Simpan perubahan image
     product.image = currentImages;
     await product.save();
 
     return res.status(200).json({
-      message: "Product updated successfully.",
+      message: "Product updated successfully!",
       product,
     });
   } catch (error) {
-    console.error("Error updating product:", error.message);
+    console.error("Error updating product:", error);
     return res.status(500).json({
-      message: "An error occurred while updating the product.",
-      error: error.message,
+      message: "Server error while updating product.",
     });
   }
 };
@@ -555,15 +600,16 @@ const getProductByUserIdAndProductId = async (req, res) => {
       product: productJSON,
     });
   } catch (error) {
-    console.error("Error fetching product by user_id and product_id:", error.message);
+    console.error(
+      "Error fetching product by user_id and product_id:",
+      error.message
+    );
     return res.status(500).json({
       message: "An error occurred while retrieving the product",
       error: error.message,
     });
   }
 };
-
-
 
 module.exports = {
   getProductsByUserId,
@@ -577,5 +623,5 @@ module.exports = {
   countProducts,
   getProductDetail,
   editProductByUserId,
-  getProductByUserIdAndProductId
+  getProductByUserIdAndProductId,
 };
