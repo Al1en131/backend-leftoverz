@@ -6,6 +6,6 @@ const routes = express.Router();
 
 routes.post("/favorite/create", authMiddleware, handleCreateFavorite);
 routes.get("/get/:productId", authMiddleware, getFavoriteStatus);
-routes.delete("/delete/:productId", authMiddleware, removeFavorite);
+routes.delete("/favorite/delete",authMiddleware, removeFavorite);
 routes.get("/favorite/user/:user_id", getAllFavoritesByUserId, authMiddleware);
 module.exports = routes;

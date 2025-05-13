@@ -75,14 +75,28 @@ const getFavoriteStatus = async (req, res) => {
 };
 
 const removeFavorite = async (req, res) => {
-  const { productId } = req.params;
-  const userId = req.user.id;
+  const { user_id, item_id } = req.body;
+
+  if (!user_id || !item_id) {
+    return res.status(400).json({ message: "User ID dan item ID wajib diisi" });
+  }
 
   try {
-    await Favorite.destroy({ where: { userId, productId } });
-    res.json({ message: "Removed from favorites" });
+    const deleted = await Favorite.destroy({
+      where: {
+        user_id,
+        item_id,
+      },
+    });
+
+    if (deleted === 0) {
+      return res.status(404).json({ message: "Favorite tidak ditemukan" });
+    }
+
+    res.json({ message: "Produk berhasil dihapus dari favorit" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to remove favorite" });
+    console.error("Gagal menghapus favorit:", error);
+    res.status(500).json({ message: "Gagal menghapus dari favorit" });
   }
 };
 
