@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, no_hp, role } = req.body;
+    const { name, email, password, phone_number, role } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -12,7 +12,7 @@ const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      no_hp,
+      phone_number,
       role,
     });
 
@@ -30,7 +30,7 @@ const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        no_hp: user.no_hp,
+        phone_number: user.phone_number,
         created_at: user.created_at,
       },
       token: token,

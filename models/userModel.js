@@ -26,7 +26,7 @@ const User = sequelize.define(
       type: DataTypes.ENUM("penjual", "pembeli", "admin"),
       defaultValue: "pembeli",
     },
-    no_hp: {
+    phone_number: {
       type: DataTypes.STRING,
       allowNull: true,
     },

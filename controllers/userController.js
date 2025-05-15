@@ -71,7 +71,7 @@ const addUser = async (req, res) => {
     email,
     password,
     role,
-    no_hp,
+    phone_number,
     address,
     province,
     regency,
@@ -80,9 +80,9 @@ const addUser = async (req, res) => {
   } = req.body;
 
   // Validasi data
-  if (!name || !email || !password || !role || !no_hp) {
+  if (!name || !email || !password || !role || !phone_number) {
     return res.status(400).json({
-      message: "Name, email, password, role, and no_hp are required",
+      message: "Name, email, password, role, and phone_number are required",
     });
   }
 
@@ -96,7 +96,7 @@ const addUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      no_hp,
+      phone_number,
       address,
       province,
       regency,
@@ -124,7 +124,7 @@ const updateUser = async (req, res) => {
     name,
     email,
     role,
-    no_hp,
+    phone_number,
     address,
     province,
     regency,
@@ -150,7 +150,7 @@ const updateUser = async (req, res) => {
       name: name ?? user.name,
       email: email ?? user.email,
       role: role ?? user.role,
-      no_hp: no_hp ?? user.no_hp,
+      phone_number: phone_number ?? user.phone_number,
       address: address ?? user.address,
       province: province ?? user.province,
       regency: regency ?? user.regency,
