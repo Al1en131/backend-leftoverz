@@ -21,7 +21,15 @@ const createProduct = async (req, res) => {
     });
   }
 
-  const { name, price, description, user_id, status } = req.body;
+  const {
+    name,
+    price,
+    description,
+    user_id,
+    status,
+    used_duration,
+    original_price,
+  } = req.body;
   if (!name || !price || !description || !user_id || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
@@ -36,6 +44,8 @@ const createProduct = async (req, res) => {
       user_id,
       status,
       image: imagePaths,
+      used_duration,
+      original_price,
     });
 
     return res.status(201).json({
@@ -310,7 +320,8 @@ const getProductsByUserId = async (req, res) => {
 
 const addProductByUserId = async (req, res) => {
   const { user_id } = req.params;
-  const { name, description, price, status } = req.body;
+  const { name, description, price, status, used_duration, original_price } =
+    req.body;
 
   if (!user_id) {
     return res.status(400).json({ message: "User ID is required." });
@@ -344,6 +355,8 @@ const addProductByUserId = async (req, res) => {
       price,
       image: imagePaths,
       status,
+      used_duration,
+      original_price,
     });
 
     return res.status(201).json({
@@ -368,6 +381,8 @@ const editProduct = async (req, res) => {
     status,
     removedImages = "[]",
     keptImages = "[]",
+    used_duration,
+    original_price,
   } = req.body;
 
   // Validasi input dasar
@@ -387,6 +402,8 @@ const editProduct = async (req, res) => {
     product.description = description;
     product.user_id = user_id;
     product.status = status;
+    product.used_duration = used_duration;
+    product.original_price = original_price;
 
     // Parse image list dari frontend
     const removedList = JSON.parse(removedImages);
@@ -454,6 +471,8 @@ const editProductByUserId = async (req, res) => {
     status,
     removedImages = "[]",
     keptImages = "[]",
+    used_duration,
+    original_price,
   } = req.body;
 
   // Validasi data
@@ -487,6 +506,8 @@ const editProductByUserId = async (req, res) => {
     product.price = price;
     product.description = description;
     product.status = status;
+    product.used_duration = used_duration;
+    product.original_price = original_price;
 
     const removedList = JSON.parse(removedImages);
     const keptList = JSON.parse(keptImages);

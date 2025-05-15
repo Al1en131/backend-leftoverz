@@ -29,6 +29,16 @@ const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+   used_duration: {
+    type: DataTypes.ENUM('New','1-3 months','4-6 months','7-12 months','1-2 years','3-4 years','5+ years'),
+    allowNull: true,
+    defaultValue: 'New'
+  },
+  original_price: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null
+  },
   image: {
     type: DataTypes.JSON, // atau DataTypes.STRING jika menyimpan path tunggal
   },

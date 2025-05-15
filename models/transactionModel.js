@@ -21,10 +21,6 @@ const Transaction = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    total_price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     payment_method: {
       type: DataTypes.ENUM("COD", "e-wallet", "bank transfer"),
       allowNull: false,
