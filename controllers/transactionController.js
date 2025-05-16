@@ -1,6 +1,40 @@
 const Transaction = require("../models/transactionModel");
 const { User, Product } = require("../models");
 
+// controllers/transactionController.js
+const midtransClient = require("midtrans-client");
+
+const snap = new midtransClient.Snap({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
+});
+
+async function createMidtransToken(req, res) {
+  try {
+    const parameter = {
+      transaction_details: {
+        order_id: req.body.order_id,
+        gross_amount: req.body.gross_amount,
+      },
+      customer_details: req.body.customer,
+    };
+
+    console.log("Midtrans Snap Parameter:", JSON.stringify(parameter, null, 2));
+
+    const transaction = await snap.createTransaction(parameter);
+
+    console.log("Midtrans Snap Response:", transaction);
+
+    res.json({ token: transaction.token }); // ini token buat snap.pay()
+  } catch (error) {
+    console.error("Midtrans Snap Error:", error);
+
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+}
+
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
@@ -140,4 +174,5 @@ module.exports = {
   getAllTransactions,
   countTransactions,
   getTransactionsByUserId,
+  createMidtransToken,
 };

@@ -6,7 +6,7 @@ const products = require("./productRoutes");
 const Transaction = require("./transactionRoutes");
 const chat = require("./chatRoutes");
 const dashboard = require("./dashboardRoutes");
-const favorite = require("./favoriteRoutes")
+const favorite = require("./favoriteRoutes");
 const apiUrl = "/api/v1";
 
 app.use(apiUrl, users);
