@@ -77,6 +77,10 @@ const addUser = async (req, res) => {
     regency,
     subdistrict,
     ward,
+    postal_code,
+    payment_account_number,
+    account_holder_name,
+    payment_type,
   } = req.body;
 
   // Validasi data
@@ -102,6 +106,10 @@ const addUser = async (req, res) => {
       regency,
       subdistrict,
       ward,
+      postal_code,
+      payment_account_number,
+      account_holder_name,
+      payment_type,
     });
 
     // Mengirimkan response sukses
@@ -130,6 +138,10 @@ const updateUser = async (req, res) => {
     regency,
     subdistrict,
     ward,
+    postal_code,
+    payment_account_number,
+    account_holder_name,
+    payment_type,
   } = req.body;
 
   if (!userId) {
@@ -156,6 +168,10 @@ const updateUser = async (req, res) => {
       regency: regency ?? user.regency,
       subdistrict: subdistrict ?? user.subdistrict,
       ward: ward ?? user.ward,
+      postal_code: postal_code ?? user.postal_code,
+      payment_account_number: payment_account_number ?? user.payment_account_number,
+      payment_type: payment_type ?? user.payment_type,
+      account_holder_name: account_holder_name ?? user.account_holder_name,
     });
 
     return res.status(200).json({

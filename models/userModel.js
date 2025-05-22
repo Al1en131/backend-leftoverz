@@ -26,8 +26,31 @@ const User = sequelize.define(
       type: DataTypes.ENUM("penjual", "pembeli", "admin"),
       defaultValue: "pembeli",
     },
+    payment_type: {
+      type: DataTypes.ENUM(
+        "gopay",
+        "shopee pay",
+        "bank bri",
+        "bank muamalat",
+        "bank mandiri",
+        "dana"
+      ),
+      defaultValue: "gopay",
+    },
     phone_number: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    payment_account_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    account_holder_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    postal_code: {
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     address: {

@@ -41,7 +41,7 @@ async function saveTransaction(req, res) {
       payment_method,
       status,
       total,
-      order_id, // harus ada
+      order_id,
     } = req.body;
 
     // Validasi sederhana
@@ -57,6 +57,7 @@ async function saveTransaction(req, res) {
       return res.status(400).json({ message: "Data transaksi tidak lengkap." });
     }
 
+    // 1. Simpan transaksi
     const newTransaction = await Transaction.create({
       buyer_id,
       seller_id,
@@ -67,8 +68,11 @@ async function saveTransaction(req, res) {
       order_id,
     });
 
+    // 2. Ubah status produk menjadi 'sold'
+    await Product.update({ status: "sold" }, { where: { id: item_id } });
+
     res.status(201).json({
-      message: "Transaksi berhasil disimpan",
+      message: "Transaksi berhasil disimpan dan produk ditandai sebagai sold",
       transaction: newTransaction,
     });
   } catch (error) {
