@@ -1,7 +1,5 @@
 const Transaction = require("../models/transactionModel");
 const { User, Product } = require("../models");
-
-// controllers/transactionController.js
 const midtransClient = require("midtrans-client");
 
 const snap = new midtransClient.Snap({
@@ -32,6 +30,50 @@ async function createMidtransToken(req, res) {
     res.status(500).json({
       message: error.message || "Internal Server Error",
     });
+  }
+}
+async function saveTransaction(req, res) {
+  try {
+    const {
+      buyer_id,
+      seller_id,
+      item_id,
+      payment_method,
+      status,
+      total,
+      order_id, // harus ada
+    } = req.body;
+
+    // Validasi sederhana
+    if (
+      !buyer_id ||
+      !seller_id ||
+      !item_id ||
+      !payment_method ||
+      !status ||
+      !total ||
+      !order_id
+    ) {
+      return res.status(400).json({ message: "Data transaksi tidak lengkap." });
+    }
+
+    const newTransaction = await Transaction.create({
+      buyer_id,
+      seller_id,
+      item_id,
+      payment_method,
+      status,
+      total,
+      order_id,
+    });
+
+    res.status(201).json({
+      message: "Transaksi berhasil disimpan",
+      transaction: newTransaction,
+    });
+  } catch (error) {
+    console.error("Gagal menyimpan transaksi:", error);
+    res.status(500).json({ message: "Gagal menyimpan transaksi" });
   }
 }
 
@@ -170,9 +212,63 @@ const getTransactionsByUserId = async (req, res) => {
   }
 };
 
+const handleMidtransWebhook = async (req, res) => {
+  try {
+    const { order_id, transaction_status, fraud_status } = req.body;
+
+    console.log("📩 Webhook received:", req.body);
+
+    // Cari transaksi berdasarkan order_id (harus objek kondisi)
+    const transaction = await Transaction.findOne({ where: { order_id } });
+
+    if (!transaction) {
+      console.log(`❌ Transaction with order_id ${order_id} not found`);
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    console.log(
+      `🔁 Updating transaction ${order_id} with status: ${transaction_status}`
+    );
+
+    // Update status berdasarkan kondisi dari Midtrans
+    if (
+      transaction_status === "settlement" ||
+      transaction_status === "capture"
+    ) {
+      if (fraud_status === "challenge") {
+        transaction.status = "challenge";
+      } else {
+        transaction.status = "success"; // atau 'settlement' sesuai logika bisnis kamu
+      }
+    } else if (transaction_status === "pending") {
+      transaction.status = "pending";
+    } else if (
+      transaction_status === "deny" ||
+      transaction_status === "expire" ||
+      transaction_status === "cancel"
+    ) {
+      transaction.status = "failed";
+    } else {
+      transaction.status = transaction_status; // fallback, simpan apa adanya
+    }
+
+    await transaction.save();
+
+    console.log(`✅ Transaction ${order_id} updated to ${transaction.status}`);
+
+    // Respon sukses supaya Midtrans tahu webhook diterima dengan baik
+    return res.status(200).json({ message: "Webhook processed successfully" });
+  } catch (error) {
+    console.error("🔥 Error in Midtrans webhook:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   getAllTransactions,
   countTransactions,
   getTransactionsByUserId,
   createMidtransToken,
+  saveTransaction,
+  handleMidtransWebhook,
 };

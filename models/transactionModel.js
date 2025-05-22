@@ -6,8 +6,8 @@ const Transaction = sequelize.define(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
     buyer_id: {
       type: DataTypes.INTEGER,
@@ -22,12 +22,20 @@ const Transaction = sequelize.define(
       allowNull: false,
     },
     payment_method: {
-      type: DataTypes.ENUM("COD", "e-wallet", "bank transfer"),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("pending", "paid", "cancelled"),
-      defaultValue: "pending",
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    order_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    total: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
