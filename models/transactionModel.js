@@ -37,6 +37,15 @@ const Transaction = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    courir: {
+      type: DataTypes.ENUM("jne", "jnt", "si cepat"),
+      allowNull: true,
+      defaultValue: "jne",
+    },
+    awb: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

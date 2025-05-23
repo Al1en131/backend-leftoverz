@@ -80,7 +80,6 @@ async function saveTransaction(req, res) {
     res.status(500).json({ message: "Gagal menyimpan transaksi" });
   }
 }
-
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
@@ -268,6 +267,107 @@ const handleMidtransWebhook = async (req, res) => {
   }
 };
 
+const getTransactionByUserIdById = async (req, res) => {
+  const { userId, transactionId } = req.params;
+
+  try {
+    // Cari transaksi berdasarkan ID
+    const transaction = await Transaction.findOne({
+      where: {
+        id: transactionId,
+      },
+      include: [
+        {
+          model: User,
+          as: "buyer",
+          attributes: ["id", "name", "email"],
+        },
+        {
+          model: User,
+          as: "seller",
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "ward",
+            "province",
+            "regency",
+            "subdistrict",
+          ],
+        },
+        {
+          model: Product,
+          as: "item",
+          attributes: ["id", "name", "price", "image"],
+        },
+      ],
+    });
+
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    // Validasi apakah user adalah buyer atau seller
+    if (
+      transaction.buyer_id.toString() !== userId &&
+      transaction.seller_id.toString() !== userId
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to view this transaction",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Transaction retrieved successfully",
+      transaction: transaction.toJSON(),
+    });
+  } catch (error) {
+    console.error("Error fetching transaction:", error.message);
+    return res.status(500).json({
+      message: "An error occurred while retrieving the transaction",
+      error: error.message,
+    });
+  }
+};
+
+const editTransactionByUserId = async (req, res) => {
+  const transactionId = req.params.id;
+  const userId = req.body.user_id; // atau req.user.id jika pakai middleware auth
+  const { awb, courir } = req.body;
+
+  try {
+    if (!awb || !courir) {
+      return res.status(400).json({ message: "awb dan courir harus diisi" });
+    }
+
+    const transaction = await Transaction.findOne({
+      where: {
+        id: transactionId,
+      },
+    });
+
+    if (!transaction) {
+      return res
+        .status(404)
+        .json({ message: "Transaksi tidak ditemukan atau bukan milik user" });
+    }
+
+    transaction.awb = awb;
+    transaction.courir = courir;
+
+    await transaction.save();
+
+    return res
+      .status(200)
+      .json({ message: "Transaksi berhasil diupdate", transaction });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getAllTransactions,
   countTransactions,
@@ -275,4 +375,6 @@ module.exports = {
   createMidtransToken,
   saveTransaction,
   handleMidtransWebhook,
+  getTransactionByUserIdById,
+  editTransactionByUserId,
 };
