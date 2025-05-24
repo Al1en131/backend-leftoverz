@@ -44,7 +44,6 @@ async function saveTransaction(req, res) {
       order_id,
     } = req.body;
 
-    // Validasi sederhana
     if (
       !buyer_id ||
       !seller_id ||
@@ -57,7 +56,6 @@ async function saveTransaction(req, res) {
       return res.status(400).json({ message: "Data transaksi tidak lengkap." });
     }
 
-    // 1. Simpan transaksi
     const newTransaction = await Transaction.create({
       buyer_id,
       seller_id,
@@ -68,7 +66,6 @@ async function saveTransaction(req, res) {
       order_id,
     });
 
-    // 2. Ubah status produk menjadi 'sold'
     await Product.update({ status: "sold" }, { where: { id: item_id } });
 
     res.status(201).json({
@@ -308,8 +305,6 @@ const getTransactionByUserIdById = async (req, res) => {
         message: "Transaction not found",
       });
     }
-
-    // Validasi apakah user adalah buyer atau seller
     if (
       transaction.buyer_id.toString() !== userId &&
       transaction.seller_id.toString() !== userId
@@ -334,7 +329,7 @@ const getTransactionByUserIdById = async (req, res) => {
 
 const editTransactionByUserId = async (req, res) => {
   const transactionId = req.params.id;
-  const userId = req.body.user_id; // atau req.user.id jika pakai middleware auth
+  const userId = req.body.user_id;
   const { awb, courir } = req.body;
 
   try {
