@@ -101,7 +101,7 @@ const removeFavorite = async (req, res) => {
 };
 
 const getAllFavoritesByUserId = async (req, res) => {
-  const { user_id } = req.params; // Mengambil user_id dari params
+  const { user_id } = req.params; 
 
   try {
     // Cek apakah user ada di database
@@ -117,12 +117,12 @@ const getAllFavoritesByUserId = async (req, res) => {
       include: [
         {
           model: Product,
-          as: "product", // Alias yang harus sesuai dengan asosiasi di model Favorite
-          attributes: ["id", "user_id", "name", "price", "image"], // Pastikan image termasuk dalam atribut
+          as: "product", 
+          attributes: ["id", "user_id", "name", "price", "image", "status"],
           include: [
             {
               model: User,
-              attributes: ["id", "name", "subdistrict"], // Ambil nama penjual
+              attributes: ["id", "name", "subdistrict"], 
             },
           ],
         },
@@ -161,6 +161,7 @@ const getAllFavoritesByUserId = async (req, res) => {
           price: product.price,
           user_id: product.user_id,
           seller_name: seller ? seller.name : null,
+          status: product.status,
           subdistrict: seller ? seller.subdistrict : null,
           image: product.image ? `${product.image}` : null, // Menangani kemungkinan null atau string array
         },

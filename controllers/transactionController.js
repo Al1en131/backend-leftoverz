@@ -23,7 +23,7 @@ async function createMidtransToken(req, res) {
 
     console.log("Midtrans Snap Response:", transaction);
 
-    res.json({ token: transaction.token }); // ini token buat snap.pay()
+    res.json({ token: transaction.token }); 
   } catch (error) {
     console.error("Midtrans Snap Error:", error);
 
@@ -287,9 +287,11 @@ const getTransactionByUserIdById = async (req, res) => {
             "name",
             "email",
             "ward",
+            "address",
             "province",
             "regency",
             "subdistrict",
+            "postal_code"
           ],
         },
         {
