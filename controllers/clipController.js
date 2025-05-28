@@ -3,25 +3,6 @@ const fetch = require("node-fetch");
 const multer = require("multer");
 
 const upload = multer({ dest: "uploads/" });
-// async function getEmbeddingFromPython(imagePath) {
-//   const form = new FormData();
-//   form.append('image', fs.createReadStream(imagePath));
-
-//   const response = await fetch('http://127.0.0.1:5000/embed-image', {
-//     method: 'POST',
-//     body: form,
-//   });
-
-//   if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
-//   const data = await response.json();
-//   return data.embedding;
-// }
-
-// // contoh pemakaian
-// getEmbeddingFromPython('./path_ke_gambar.jpg')
-//   .then(embedding => console.log('Embedding dari Python:', embedding))
-//   .catch(console.error);
 
 const FormData = require("form-data");
 
@@ -80,4 +61,4 @@ const embedFormLocalController = async (req, res) => {
     res.status(500).json({ error: "Failed to embed image", detail: err.message });
   }
 };
-module.exports = { handleClipUpload, upload, embedImage, embedLocalController, embedFormLocalController };
+module.exports = { upload, embedLocalController, embedFormLocalController };
