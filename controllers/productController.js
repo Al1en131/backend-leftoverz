@@ -29,7 +29,9 @@ const createProduct = async (req, res) => {
     status,
     used_duration,
     original_price,
+    embedding, // tambahkan ini
   } = req.body;
+
   if (!name || !price || !description || !user_id || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
@@ -37,6 +39,16 @@ const createProduct = async (req, res) => {
   const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
 
   try {
+    // Parsing embedding jika berupa string
+    let parsedEmbedding = null;
+    if (embedding) {
+      if (typeof embedding === "string") {
+        parsedEmbedding = JSON.parse(embedding);
+      } else if (Array.isArray(embedding)) {
+        parsedEmbedding = embedding;
+      }
+    }
+
     const newProduct = await Product.create({
       name,
       price,
@@ -46,6 +58,7 @@ const createProduct = async (req, res) => {
       image: imagePaths,
       used_duration,
       original_price,
+      embedding: parsedEmbedding, // tambahkan ini
     });
 
     return res.status(201).json({
@@ -320,8 +333,15 @@ const getProductsByUserId = async (req, res) => {
 
 const addProductByUserId = async (req, res) => {
   const { user_id } = req.params;
-  const { name, description, price, status, used_duration, original_price } =
-    req.body;
+  const {
+    name,
+    description,
+    price,
+    status,
+    used_duration,
+    original_price,
+    embedding,
+  } = req.body;
 
   if (!user_id) {
     return res.status(400).json({ message: "User ID is required." });
@@ -348,6 +368,16 @@ const addProductByUserId = async (req, res) => {
 
     const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
 
+    // Parse embedding jika perlu
+    let parsedEmbedding = null;
+    if (embedding) {
+      if (typeof embedding === "string") {
+        parsedEmbedding = JSON.parse(embedding);
+      } else if (Array.isArray(embedding)) {
+        parsedEmbedding = embedding;
+      }
+    }
+
     const newProduct = await Product.create({
       user_id,
       name,
@@ -357,6 +387,7 @@ const addProductByUserId = async (req, res) => {
       status,
       used_duration,
       original_price,
+      embedding: parsedEmbedding, // tambahkan embedding
     });
 
     return res.status(201).json({
@@ -371,6 +402,7 @@ const addProductByUserId = async (req, res) => {
     });
   }
 };
+
 const editProduct = async (req, res) => {
   const { id } = req.params;
   const {
@@ -383,9 +415,9 @@ const editProduct = async (req, res) => {
     keptImages = "[]",
     used_duration,
     original_price,
+    embedding, // tambahkan
   } = req.body;
 
-  // Validasi input dasar
   if (!name || !price || !description || !user_id || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
@@ -405,11 +437,20 @@ const editProduct = async (req, res) => {
     product.used_duration = used_duration;
     product.original_price = original_price;
 
-    // Parse image list dari frontend
+    // Parse dan update embedding jika diberikan
+    if (embedding) {
+      try {
+        product.embedding =
+          typeof embedding === "string" ? JSON.parse(embedding) : embedding;
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid embedding format." });
+      }
+    }
+
+    // Handle image deletion
     const removedList = JSON.parse(removedImages);
     const keptList = JSON.parse(keptImages);
 
-    // Hapus file yang dihapus dari server
     removedList.forEach((img) => {
       const filePath = path.join(__dirname, `../public${img}`);
       try {
@@ -421,15 +462,13 @@ const editProduct = async (req, res) => {
       }
     });
 
-    // Mulai dengan gambar yang ingin dipertahankan
     let currentImages = keptList;
 
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
 
-      // Cek total gambar tidak lebih dari 5
       if (currentImages.length + newImages.length > 5) {
-        // Hapus file upload baru (rollback)
+        // Hapus file upload baru
         newImages.forEach((img) => {
           const filePath = path.join(__dirname, `../public${img}`);
           if (fs.existsSync(filePath)) {
@@ -473,6 +512,7 @@ const editProductByUserId = async (req, res) => {
     keptImages = "[]",
     used_duration,
     original_price,
+    embedding, // tambahan
   } = req.body;
 
   // Validasi data
@@ -508,6 +548,16 @@ const editProductByUserId = async (req, res) => {
     product.status = status;
     product.used_duration = used_duration;
     product.original_price = original_price;
+
+    // Update embedding jika ada
+    if (embedding) {
+      try {
+        product.embedding =
+          typeof embedding === "string" ? JSON.parse(embedding) : embedding;
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid embedding format." });
+      }
+    }
 
     const removedList = JSON.parse(removedImages);
     const keptList = JSON.parse(keptImages);
