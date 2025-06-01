@@ -1,33 +1,34 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
 const routes = require("./routes");
 const path = require("path");
 
-// INIT
 const app = express();
 
-// CORS
+// ✅ CORS Setup untuk akses dari frontend kamu di Vercel
 app.use(cors({
-  origin: "https://leftoverz-app.vercel.app",
+  origin: "https://leftoverz-app.vercel.app", // frontend domain
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 app.options("*", cors());
 
-// Static & JSON
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ✅ Middleware
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(routes); // prefix route biar rapi
 
-// Routes
-app.use(routes);
-
-// Sequelize Connect
+// ✅ DB Connection
 sequelize
   .authenticate()
   .then(() => console.log("✅ Database connected"))
   .catch((err) => console.error("❌ Database connection error:", err));
 
-// ✅ Export sebagai handler ke Vercel
-module.exports = app;
+// ✅ Jalankan server (Railway akan otomatis gunakan PORT dari env)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
