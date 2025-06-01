@@ -1,12 +1,12 @@
 const fs = require("fs");
-const fetch = require("node-fetch");
 const multer = require("multer");
+const FormData = require("form-data");
 
 const upload = multer({ dest: "uploads/" });
 
-const FormData = require("form-data");
-
 async function getEmbeddingFromPython(imagePath) {
+  const fetch = (await import("node-fetch")).default;
+
   const form = new FormData();
   form.append("image", fs.createReadStream(imagePath));
 
@@ -61,4 +61,5 @@ const embedFormLocalController = async (req, res) => {
     res.status(500).json({ error: "Failed to embed image", detail: err.message });
   }
 };
+
 module.exports = { upload, embedLocalController, embedFormLocalController };
