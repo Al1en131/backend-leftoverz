@@ -18,8 +18,6 @@ app.use(
 
 app.use(routes);
 
-const PORT = process.env.PORT || 1031;
-
 sequelize
   .authenticate()
   .then(() => console.log("✅ Database connected"))
