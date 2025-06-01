@@ -1,0 +1,14 @@
+# railway.toml
+
+[build]
+  # Perintah build yang dijalankan Railway untuk membangun aplikasi kamu
+  command = "npm install"
+
+[deploy]
+  # Perintah start yang Railway jalankan untuk menjalankan server kamu
+  command = "npm start"
+
+[env]
+  # Contoh environment variables yang kamu pakai di project
+  PORT = "1031"
+  DATABASE_URL = "mysql://user:password@host:port/dbname"
