@@ -29,7 +29,7 @@ const createProduct = async (req, res) => {
     status,
     used_duration,
     original_price,
-    embedding, // tambahkan ini
+    embedding, 
   } = req.body;
 
   if (!name || !price || !description || !user_id || !status) {
@@ -39,7 +39,6 @@ const createProduct = async (req, res) => {
   const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
 
   try {
-    // Parsing embedding jika berupa string
     let parsedEmbedding = null;
     if (embedding) {
       if (typeof embedding === "string") {
@@ -58,7 +57,7 @@ const createProduct = async (req, res) => {
       image: imagePaths,
       used_duration,
       original_price,
-      embedding: parsedEmbedding, // tambahkan ini
+      embedding: parsedEmbedding, 
     });
 
     return res.status(201).json({
@@ -182,14 +181,12 @@ const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Cari produk berdasarkan ID
     const product = await Product.findByPk(id);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // (Opsional) Hapus file gambar dari sistem file
     const fs = require("fs");
     if (product.image && Array.isArray(product.image)) {
       product.image.forEach((imgPath) => {
@@ -201,8 +198,6 @@ const deleteProduct = async (req, res) => {
         });
       });
     }
-
-    // Hapus produk dari database
     await product.destroy();
 
     return res.status(200).json({ message: "Product deleted successfully." });
@@ -360,7 +355,6 @@ const addProductByUserId = async (req, res) => {
   }
 
   try {
-    // Cek apakah user valid
     const user = await User.findByPk(user_id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -368,7 +362,6 @@ const addProductByUserId = async (req, res) => {
 
     const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
 
-    // Parse embedding jika perlu
     let parsedEmbedding = null;
     if (embedding) {
       if (typeof embedding === "string") {
@@ -387,7 +380,7 @@ const addProductByUserId = async (req, res) => {
       status,
       used_duration,
       original_price,
-      embedding: parsedEmbedding, // tambahkan embedding
+      embedding: parsedEmbedding, 
     });
 
     return res.status(201).json({
@@ -415,7 +408,7 @@ const editProduct = async (req, res) => {
     keptImages = "[]",
     used_duration,
     original_price,
-    embedding, // tambahkan
+    embedding, 
   } = req.body;
 
   if (!name || !price || !description || !user_id || !status) {
@@ -428,7 +421,6 @@ const editProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // Update field utama
     product.name = name;
     product.price = price;
     product.description = description;
@@ -437,7 +429,6 @@ const editProduct = async (req, res) => {
     product.used_duration = used_duration;
     product.original_price = original_price;
 
-    // Parse dan update embedding jika diberikan
     if (embedding) {
       try {
         product.embedding =
@@ -447,7 +438,6 @@ const editProduct = async (req, res) => {
       }
     }
 
-    // Handle image deletion
     const removedList = JSON.parse(removedImages);
     const keptList = JSON.parse(keptImages);
 
@@ -468,7 +458,6 @@ const editProduct = async (req, res) => {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
 
       if (currentImages.length + newImages.length > 5) {
-        // Hapus file upload baru
         newImages.forEach((img) => {
           const filePath = path.join(__dirname, `../public${img}`);
           if (fs.existsSync(filePath)) {
@@ -485,7 +474,6 @@ const editProduct = async (req, res) => {
       currentImages.push(...newImages);
     }
 
-    // Simpan perubahan image
     product.image = currentImages;
     await product.save();
 
@@ -512,22 +500,18 @@ const editProductByUserId = async (req, res) => {
     keptImages = "[]",
     used_duration,
     original_price,
-    embedding, // tambahan
+    embedding,
   } = req.body;
 
-  // Validasi data
   if (!name || !price || !description || !status) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
   try {
-    // Cek apakah user valid
     const user = await User.findByPk(user_id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
-
-    // Cari produk berdasarkan user_id dan product_id
     const product = await Product.findOne({
       where: {
         id: product_id,
@@ -541,7 +525,6 @@ const editProductByUserId = async (req, res) => {
         .json({ message: "Product not found or not owned by user." });
     }
 
-    // Update field utama
     product.name = name;
     product.price = price;
     product.description = description;
@@ -549,7 +532,6 @@ const editProductByUserId = async (req, res) => {
     product.used_duration = used_duration;
     product.original_price = original_price;
 
-    // Update embedding jika ada
     if (embedding) {
       try {
         product.embedding =
@@ -562,7 +544,6 @@ const editProductByUserId = async (req, res) => {
     const removedList = JSON.parse(removedImages);
     const keptList = JSON.parse(keptImages);
 
-    // Hapus file yang dihapus dari server
     removedList.forEach((img) => {
       const filePath = path.join(__dirname, `../public${img}`);
       try {
@@ -574,15 +555,12 @@ const editProductByUserId = async (req, res) => {
       }
     });
 
-    // Mulai dengan gambar yang ingin dipertahankan
     let currentImages = keptList;
 
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
 
-      // Cek total gambar tidak lebih dari 5
       if (currentImages.length + newImages.length > 5) {
-        // Hapus file upload baru (rollback)
         newImages.forEach((img) => {
           const filePath = path.join(__dirname, `../public${img}`);
           if (fs.existsSync(filePath)) {
@@ -599,7 +577,6 @@ const editProductByUserId = async (req, res) => {
       currentImages.push(...newImages);
     }
 
-    // Simpan perubahan image
     product.image = currentImages;
     await product.save();
 

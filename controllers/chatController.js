@@ -1,4 +1,4 @@
-const { Chat, User, Product } = require("../models"); // Pastikan model sudah di-import dengan benar
+const { Chat, User, Product } = require("../models"); 
 
 const getAllChats = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ const getAllChats = async (req, res) => {
         },
         {
           model: Product,
-          attributes: ["id", "name"], // sesuaikan dengan kolom item yang kamu butuhkan
+          attributes: ["id", "name"], 
         },
       ],
     });
@@ -107,8 +107,6 @@ const getMessagesBetweenUsers = async (req, res) => {
       ],
       order: [["created_at", "ASC"]],
     });
-
-    // Filter manual di JavaScript
     const filteredMessages = messages.filter(
       (msg) =>
         (String(msg.sender_id) === user1 &&
@@ -124,23 +122,19 @@ const getMessagesBetweenUsers = async (req, res) => {
 };
 
 const readMessage = async (req, res) => {
-  const chatId = req.params.id; // Ambil ID dari parameter tanpa konversi
+  const chatId = req.params.id; 
 
   try {
-    // Temukan chat berdasarkan ID
     const chat = await Chat.findByPk(chatId);
 
     if (!chat) {
       return res.status(404).json({ message: "Chat tidak ditemukan" });
     }
 
-    // Update read_status menjadi 1
     chat.read_status = "1";
 
-    // Simpan perubahan
     await chat.save();
 
-    // Kirim response berhasil
     return res.status(200).json({ message: "Chat telah dibaca", chat });
   } catch (error) {
     console.error("Error updating read_status:", error.message || error.stack);
@@ -213,7 +207,6 @@ const getMessagesByProductId = async (req, res) => {
       order: [["created_at", "ASC"]],
     });
 
-    // Filter secara manual berdasarkan kombinasi user1 dan user2
     const filteredMessages = messages.filter(
       (msg) =>
         (String(msg.sender_id) === user1 &&

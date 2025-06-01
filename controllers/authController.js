@@ -15,8 +15,6 @@ const register = async (req, res) => {
       phone_number,
       role,
     });
-
-    // Generate JWT token
     const token = jwt.sign(
       { id: user.id, role: user.role, name: user.name, email: user.email },
       process.env.JWT_SECRET,
@@ -75,7 +73,6 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    // Hanya memberitahu client untuk menghapus token
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.error(error);
