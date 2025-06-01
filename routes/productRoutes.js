@@ -20,9 +20,9 @@ const {
 routes.get("/products", authMiddleware, getAllProducts);
 routes.get("/allproducts", getAllProducts);
 routes.post("/product/create", authMiddleware, uploadMiddleware, createProduct);
-routes.put("/product/edit/:id", uploadMiddleware, authMiddleware, editProduct);
+routes.put("/product/edit/:id", authMiddleware, uploadMiddleware, editProduct);
 routes.get("/product/:id", getProductById);
-routes.delete("/products/:id", deleteProduct, authMiddleware);
+routes.delete("/products/:id", authMiddleware, deleteProduct);
 routes.get("/product/detail/:id", getProductDetail);
 routes.get("/products/user/:user_id", getProductsByUserId);
 routes.post(
@@ -37,6 +37,9 @@ routes.put(
   authMiddleware,
   editProductByUserId
 );
-routes.get("/products/get/:user_id/:product_id", getProductByUserIdAndProductId);
+routes.get(
+  "/products/get/:user_id/:product_id",
+  getProductByUserIdAndProductId
+);
 
 module.exports = routes;
