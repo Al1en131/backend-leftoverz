@@ -1,44 +1,32 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
+const path = require("path");
 const sequelize = require("./config/db");
 const routes = require("./routes");
-const path = require("path");
 
 const app = express();
 
-// Serve static files from the uploads directory
+// Serve static files from /uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Body parser middleware
+// JSON parser
 app.use(express.json());
 
-// ✅ Middleware manual untuk mengatur CORS secara eksplisit (WAJIB di Vercel)
+// ✅ Manual CORS setup — WAJIB untuk Vercel
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://leftoverz-app.vercel.app");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
 
-  // Tangani preflight request (OPTIONS)
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(200).end(); // tangani preflight
   }
 
   next();
 });
 
-// Optional: tetap bisa pakai cors() untuk local dev
-app.use(
-  cors({
-    origin: "https://leftoverz-app.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-// Gunakan routes kamu
+// Gunakan routing
 app.use(routes);
 
 // Test koneksi ke database
