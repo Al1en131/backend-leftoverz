@@ -28,7 +28,7 @@ sequelize
   .catch((err) => console.error("❌ Database connection error:", err));
 
 // ✅ Jalankan server (Railway akan otomatis gunakan PORT dari env)
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 1031;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
