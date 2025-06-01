@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db"); // Pastikan Anda menyesuaikan path untuk koneksi database
+const sequelize = require("../config/db"); 
 
 const Favorite = sequelize.define(
   "Favorite",
@@ -24,8 +24,8 @@ const Favorite = sequelize.define(
     },
   },
   {
-    timestamps: false, // Menyimpan kolom createdAt dan updatedAt
-    tableName: "favorites", // Nama tabel di database
+    timestamps: false, 
+    tableName: "favorites", 
   }
 );
 

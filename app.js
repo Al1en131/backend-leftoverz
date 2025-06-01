@@ -5,10 +5,8 @@ const sequelize = require("./config/db");
 const routes = require("./routes"); 
 const path = require('path');
 
-// Deklarasikan app dulu baru gunakan middleware
 const app = express();
 
-// Serve folder 'uploads' secara publik
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(express.json());

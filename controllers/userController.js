@@ -34,7 +34,6 @@ const getUserById = async (req, res) => {
   }
 
   try {
-    // Cari pengguna berdasarkan ID
     const user = await User.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -43,7 +42,6 @@ const getUserById = async (req, res) => {
       });
     }
 
-    // Mengubah data pengguna menjadi format JSON dan mengirimkan respons
     return res.status(200).json({
       message: "User retrieved successfully",
       user: user.toJSON(),
@@ -56,9 +54,8 @@ const getUserById = async (req, res) => {
     });
   }
 };
-const saltRounds = 10; // Jumlah salt untuk bcrypt (semakin tinggi, semakin aman namun lebih lambat)
+const saltRounds = 10; 
 
-// Fungsi untuk mengenkripsi password
 const encryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(saltRounds);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -83,7 +80,6 @@ const addUser = async (req, res) => {
     payment_type,
   } = req.body;
 
-  // Validasi data
   if (!name || !email || !password || !role || !phone_number) {
     return res.status(400).json({
       message: "Name, email, password, role, and phone_number are required",
@@ -91,10 +87,8 @@ const addUser = async (req, res) => {
   }
 
   try {
-    // Enkripsi password
     const hashedPassword = await encryptPassword(password);
 
-    // Membuat pengguna baru dengan password terenkripsi
     const newUser = await User.create({
       name,
       email,
@@ -112,7 +106,6 @@ const addUser = async (req, res) => {
       payment_type,
     });
 
-    // Mengirimkan response sukses
     return res.status(201).json({
       message: "User created successfully",
       user: newUser.toJSON(),

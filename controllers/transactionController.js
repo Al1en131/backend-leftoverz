@@ -141,7 +141,6 @@ const getTransactionsByUserId = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // Transaksi sebagai buyer
     const buyerTransactions = await Transaction.findAll({
       where: { buyer_id: userId },
       include: [
@@ -163,7 +162,6 @@ const getTransactionsByUserId = async (req, res) => {
       ],
     });
 
-    // Transaksi sebagai seller
     const sellerTransactions = await Transaction.findAll({
       where: { seller_id: userId },
       include: [
@@ -218,7 +216,6 @@ const handleMidtransWebhook = async (req, res) => {
 
     console.log("📩 Webhook received:", req.body);
 
-    // Cari transaksi berdasarkan order_id (harus objek kondisi)
     const transaction = await Transaction.findOne({ where: { order_id } });
 
     if (!transaction) {
@@ -230,7 +227,6 @@ const handleMidtransWebhook = async (req, res) => {
       `🔁 Updating transaction ${order_id} with status: ${transaction_status}`
     );
 
-    // Update status berdasarkan kondisi dari Midtrans
     if (
       transaction_status === "settlement" ||
       transaction_status === "capture"
@@ -238,7 +234,7 @@ const handleMidtransWebhook = async (req, res) => {
       if (fraud_status === "challenge") {
         transaction.status = "challenge";
       } else {
-        transaction.status = "success"; // atau 'settlement' sesuai logika bisnis kamu
+        transaction.status = "success"; 
       }
     } else if (transaction_status === "pending") {
       transaction.status = "pending";
@@ -249,14 +245,13 @@ const handleMidtransWebhook = async (req, res) => {
     ) {
       transaction.status = "failed";
     } else {
-      transaction.status = transaction_status; // fallback, simpan apa adanya
+      transaction.status = transaction_status; 
     }
 
     await transaction.save();
 
     console.log(`✅ Transaction ${order_id} updated to ${transaction.status}`);
 
-    // Respon sukses supaya Midtrans tahu webhook diterima dengan baik
     return res.status(200).json({ message: "Webhook processed successfully" });
   } catch (error) {
     console.error("🔥 Error in Midtrans webhook:", error);
@@ -268,7 +263,6 @@ const getTransactionByUserIdById = async (req, res) => {
   const { userId, transactionId } = req.params;
 
   try {
-    // Cari transaksi berdasarkan ID
     const transaction = await Transaction.findOne({
       where: {
         id: transactionId,

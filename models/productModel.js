@@ -50,7 +50,7 @@ const Product = sequelize.define(
       defaultValue: null,
     },
     image: {
-      type: DataTypes.JSON, // atau DataTypes.STRING jika menyimpan path tunggal
+      type: DataTypes.JSON, 
     },
     embedding: {
       type: DataTypes.JSON,

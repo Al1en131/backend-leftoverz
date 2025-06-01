@@ -34,7 +34,7 @@ const Chat = sequelize.define("Chat", {
     },
   }, {
     tableName: "chats",
-    timestamps: false, // karena kamu pakai manual created_at
+    timestamps: false, 
   });
 module.exports = Chat;
   
