@@ -5,12 +5,10 @@ const FormData = require("form-data");
 const upload = multer({ dest: "uploads/" });
 
 async function getEmbeddingFromPython(imagePath) {
-  const fetch = (await import("node-fetch")).default;
-
   const form = new FormData();
-  form.append("image", fs.createReadStream(imagePath));
+  form.append("data", fs.createReadStream(imagePath)); // Gradio expects field name "data"
 
-  const response = await fetch("http://127.0.0.1:5000/embed-image", {
+  const response = await fetch("https://alien131-clip.hf.space/run/predict", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
@@ -21,8 +19,8 @@ async function getEmbeddingFromPython(imagePath) {
     throw new Error(`Error: ${response.statusText} - ${errText}`);
   }
 
-  const data = await response.json();
-  return data.embedding;
+  const result = await response.json();
+  return result.data[0]; 
 }
 
 const embedLocalController = async (req, res) => {
@@ -58,7 +56,9 @@ const embedFormLocalController = async (req, res) => {
     res.status(200).json({ embedding });
   } catch (err) {
     console.error("embed-local error:", err);
-    res.status(500).json({ error: "Failed to embed image", detail: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to embed image", detail: err.message });
   }
 };
 
