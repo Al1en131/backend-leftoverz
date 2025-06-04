@@ -5,6 +5,7 @@ const FormData = require("form-data");
 const upload = multer({ dest: "uploads/" });
 
 async function getEmbeddingFromPython(imagePath) {
+  const fetch = (await import("node-fetch")).default;
   const form = new FormData();
   form.append("data", fs.createReadStream(imagePath)); // field name "data" untuk Gradio
 
