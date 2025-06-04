@@ -1,7 +1,6 @@
 const fs = require("fs");
 const multer = require("multer");
 const FormData = require("form-data");
-const fetch = require("node-fetch"); // Tambahkan ini di CommonJS
 
 const upload = multer({ dest: "uploads/" });
 
