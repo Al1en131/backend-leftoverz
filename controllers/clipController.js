@@ -19,8 +19,8 @@ async function getEmbeddingFromPython(imagePath) {
     throw new Error(`Error: ${response.statusText} - ${errText}`);
   }
 
-  const result = await response.json();
-  return result.data[0]; 
+  const data = await response.json();
+  return data.embedding;
 }
 
 const embedLocalController = async (req, res) => {
