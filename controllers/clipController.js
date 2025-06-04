@@ -10,7 +10,7 @@ async function getEmbeddingFromPython(imagePath) {
   const form = new FormData();
   form.append("image", fs.createReadStream(imagePath));
 
-  const response = await fetch("http://localhost:7860/embed-image", {
+  const response = await fetch("http://0.0.0.0:7860/embed-image", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
