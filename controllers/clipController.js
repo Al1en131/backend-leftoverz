@@ -5,12 +5,10 @@ const FormData = require("form-data");
 const upload = multer({ dest: "uploads/" });
 
 async function getEmbeddingFromPython(imagePath) {
-  const fetch = (await import("node-fetch")).default;
-
   const form = new FormData();
-  form.append("image", fs.createReadStream(imagePath));
+  form.append("data", fs.createReadStream(imagePath)); // field name "data" untuk Gradio
 
-  const response = await fetch("http://127.0.0.1:5000/embed-image", {
+  const response = await fetch("https://alien131-clip.hf.space/run/predict", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
@@ -22,7 +20,10 @@ async function getEmbeddingFromPython(imagePath) {
   }
 
   const data = await response.json();
-  return data.embedding;
+
+  // ✅ Sesuaikan respons Gradio
+  const embedding = data.data[0];
+  return embedding;
 }
 
 const embedLocalController = async (req, res) => {
@@ -32,34 +33,28 @@ const embedLocalController = async (req, res) => {
     }
 
     const imagePath = req.file.path;
-    console.log("Image path:", imagePath);
+    console.log("📸 Uploaded image path:", imagePath);
 
     const embedding = await getEmbeddingFromPython(imagePath);
-    console.log("Embedding:", embedding);
+    console.log("✅ Got embedding:", embedding.slice(0, 5), "...");
 
+    // Hapus file setelah selesai
     await fs.promises.unlink(imagePath);
 
     return res.status(200).json({ embedding });
   } catch (err) {
-    console.error("embed-local error:", err);
+    console.error("❌ embed-local error:", err);
     return res
       .status(500)
       .json({ error: "Failed to embed image", detail: err.message });
   }
 };
 
-const embedFormLocalController = async (req, res) => {
-  try {
-    const imagePath = req.file.path;
-    const embedding = await getEmbeddingFromPython(imagePath);
+// Opsional: kalau `embedFormLocalController` tidak beda jauh, bisa dihapus atau ganti isinya sama
+const embedFormLocalController = embedLocalController;
 
-    await fs.promises.unlink(imagePath);
-
-    res.status(200).json({ embedding });
-  } catch (err) {
-    console.error("embed-local error:", err);
-    res.status(500).json({ error: "Failed to embed image", detail: err.message });
-  }
+module.exports = {
+  upload,
+  embedLocalController,
+  embedFormLocalController,
 };
-
-module.exports = { upload, embedLocalController, embedFormLocalController };
