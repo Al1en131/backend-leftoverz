@@ -10,7 +10,7 @@ async function getEmbeddingFromPython(imagePath) {
   const form = new FormData();
   form.append("image", fs.createReadStream(imagePath));
 
-  const response = await fetch("https://huggingface.co/spaces/Alien131/clip-image/embed-image", {
+  const response = await fetch("http://localhost:7860/embed-image", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
@@ -58,7 +58,9 @@ const embedFormLocalController = async (req, res) => {
     res.status(200).json({ embedding });
   } catch (err) {
     console.error("embed-local error:", err);
-    res.status(500).json({ error: "Failed to embed image", detail: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to embed image", detail: err.message });
   }
 };
 
