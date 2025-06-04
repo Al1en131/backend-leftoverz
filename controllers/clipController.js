@@ -5,7 +5,7 @@ const FormData = require("form-data");
 const upload = multer({ dest: "uploads/" });
 
 // Ganti ini dengan IP/hostname backend Python yang benar
-const PYTHON_API_URL = "http://localhost:7860/embed-image";
+const PYTHON_API_URL = "http://127.0.0.1:7860/embed-image";
 
 async function getEmbeddingFromPython(imagePath) {
   const fetch = (await import("node-fetch")).default;
