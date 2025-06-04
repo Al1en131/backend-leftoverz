@@ -8,7 +8,7 @@ async function getEmbeddingFromPython(imagePath) {
   const form = new FormData();
   form.append("data", fs.createReadStream(imagePath)); // field name "data" untuk Gradio
 
-  const response = await fetch("https://huggingface.co/spaces/Alien131/clip/api/predict/", {
+  const response = await fetch("https://alien131-clip.hf.space/api/predict/", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
