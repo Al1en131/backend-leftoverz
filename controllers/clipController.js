@@ -4,13 +4,16 @@ const FormData = require("form-data");
 
 const upload = multer({ dest: "uploads/" });
 
+// Ganti ini dengan IP/hostname backend Python yang benar
+const PYTHON_API_URL = "http://localhost:7860/embed-image";
+
 async function getEmbeddingFromPython(imagePath) {
   const fetch = (await import("node-fetch")).default;
 
   const form = new FormData();
   form.append("image", fs.createReadStream(imagePath));
 
-  const response = await fetch("http://0.0.0.0:7860/embed-image", {
+  const response = await fetch(PYTHON_API_URL, {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
@@ -50,7 +53,12 @@ const embedLocalController = async (req, res) => {
 
 const embedFormLocalController = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
     const imagePath = req.file.path;
+
     const embedding = await getEmbeddingFromPython(imagePath);
 
     await fs.promises.unlink(imagePath);
