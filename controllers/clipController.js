@@ -6,10 +6,11 @@ const upload = multer({ dest: "uploads/" });
 
 async function getEmbeddingFromPython(imagePath) {
   const fetch = (await import("node-fetch")).default;
-  const form = new FormData();
-  form.append("data", fs.createReadStream(imagePath)); // field name "data" untuk Gradio
 
-  const response = await fetch("https://alien131-clip.hf.space/api/predict", {
+  const form = new FormData();
+  form.append("image", fs.createReadStream(imagePath));
+
+  const response = await fetch("https://huggingface.co/spaces/Alien131/clip-image/embed-image", {
     method: "POST",
     body: form,
     headers: form.getHeaders(),
@@ -21,8 +22,9 @@ async function getEmbeddingFromPython(imagePath) {
   }
 
   const data = await response.json();
-  return embedding;
+  return data.embedding;
 }
+
 const embedLocalController = async (req, res) => {
   try {
     if (!req.file) {
@@ -56,9 +58,7 @@ const embedFormLocalController = async (req, res) => {
     res.status(200).json({ embedding });
   } catch (err) {
     console.error("embed-local error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to embed image", detail: err.message });
+    res.status(500).json({ error: "Failed to embed image", detail: err.message });
   }
 };
 
