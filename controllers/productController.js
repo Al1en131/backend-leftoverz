@@ -220,7 +220,7 @@ const getProductDetail = async (req, res) => {
           attributes: [
             "id",
             "name",
-            "no_hp",
+            "phone_number",
             "email",
             "subdistrict",
             "ward",
@@ -242,7 +242,7 @@ const getProductDetail = async (req, res) => {
     const productJSON = product.toJSON();
     productJSON.seller = {
       name: productJSON.User.name,
-      no_hp: productJSON.User.no_hp,
+      phone_number: productJSON.User.phone_number,
     };
     productJSON.user = {
       subdistrict: productJSON.User.subdistrict,
@@ -284,7 +284,7 @@ const getProductsByUserId = async (req, res) => {
           "id",
           "name",
           "email",
-          "no_hp",
+          "phone_number",
           "subdistrict",
           "ward",
           "regency",
@@ -304,7 +304,7 @@ const getProductsByUserId = async (req, res) => {
       const productJSON = product.toJSON();
       productJSON.seller = {
         name: productJSON.User.name,
-        no_hp: productJSON.User.no_hp,
+        phone_number: productJSON.User.phone_number,
       };
       productJSON.user = {
         subdistrict: productJSON.User.subdistrict,
