@@ -220,6 +220,7 @@ const getProductDetail = async (req, res) => {
           attributes: [
             "id",
             "name",
+            "no_hp",
             "email",
             "subdistrict",
             "ward",
@@ -248,6 +249,7 @@ const getProductDetail = async (req, res) => {
       regency: productJSON.User.regency,
       province: productJSON.User.province,
       address: productJSON.User.address,
+      no_hp: productJSON.User.no_hp,
     };
     delete productJSON.User;
 
