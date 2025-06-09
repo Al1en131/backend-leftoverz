@@ -29,7 +29,7 @@ const createProduct = async (req, res) => {
     status,
     used_duration,
     original_price,
-    embedding, 
+    embedding,
   } = req.body;
 
   if (!name || !price || !description || !user_id || !status) {
@@ -57,7 +57,7 @@ const createProduct = async (req, res) => {
       image: imagePaths,
       used_duration,
       original_price,
-      embedding: parsedEmbedding, 
+      embedding: parsedEmbedding,
     });
 
     return res.status(201).json({
@@ -242,6 +242,7 @@ const getProductDetail = async (req, res) => {
     const productJSON = product.toJSON();
     productJSON.seller = {
       name: productJSON.User.name,
+      no_hp: productJSON.User.no_hp,
     };
     productJSON.user = {
       subdistrict: productJSON.User.subdistrict,
@@ -249,7 +250,6 @@ const getProductDetail = async (req, res) => {
       regency: productJSON.User.regency,
       province: productJSON.User.province,
       address: productJSON.User.address,
-      no_hp: productJSON.User.no_hp,
     };
     delete productJSON.User;
 
@@ -284,6 +284,7 @@ const getProductsByUserId = async (req, res) => {
           "id",
           "name",
           "email",
+          "no_hp",
           "subdistrict",
           "ward",
           "regency",
@@ -303,6 +304,7 @@ const getProductsByUserId = async (req, res) => {
       const productJSON = product.toJSON();
       productJSON.seller = {
         name: productJSON.User.name,
+        no_hp: productJSON.User.no_hp,
       };
       productJSON.user = {
         subdistrict: productJSON.User.subdistrict,
@@ -382,7 +384,7 @@ const addProductByUserId = async (req, res) => {
       status,
       used_duration,
       original_price,
-      embedding: parsedEmbedding, 
+      embedding: parsedEmbedding,
     });
 
     return res.status(201).json({
@@ -410,7 +412,7 @@ const editProduct = async (req, res) => {
     keptImages = "[]",
     used_duration,
     original_price,
-    embedding, 
+    embedding,
   } = req.body;
 
   if (!name || !price || !description || !user_id || !status) {
