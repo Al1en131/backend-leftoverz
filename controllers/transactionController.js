@@ -77,6 +77,48 @@ async function saveTransaction(req, res) {
     res.status(500).json({ message: "Gagal menyimpan transaksi" });
   }
 }
+async function refundTransaction(req, res) {
+  const { order_id } = req.params;
+  const { amount, reason } = req.body;
+
+  if (!order_id || !amount) {
+    return res.status(400).json({ message: "order_id dan amount diperlukan" });
+  }
+
+  try {
+    const base64ServerKey = Buffer.from(
+      `${process.env.MIDTRANS_SERVER_KEY}:`
+    ).toString("base64");
+
+    const response = await axios.post(
+      `https://api.midtrans.com/v2/${order_id}/refund`, // Production endpoint
+      {
+        amount,
+        reason: reason || "Refund requested by user",
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${base64ServerKey}`,
+        },
+      }
+    );
+
+    // Optionally update status in your DB
+    await Transaction.update({ status: "refunded" }, { where: { order_id } });
+
+    res.status(200).json({
+      message: "Refund berhasil diproses",
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Midtrans Refund Error:", error?.response?.data || error);
+    res.status(500).json({
+      message: "Refund gagal",
+      error: error?.response?.data || error.message,
+    });
+  }
+}
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
@@ -390,4 +432,5 @@ module.exports = {
   handleMidtransWebhook,
   getTransactionByUserIdById,
   editTransactionByUserId,
+  refundTransaction
 };
