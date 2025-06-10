@@ -157,7 +157,7 @@ const getTransactionsByUserId = async (req, res) => {
             "province",
             "subdistrict",
             "postal_code",
-            "no_hp",
+            "phone_number",
           ],
         },
         {
@@ -189,7 +189,7 @@ const getTransactionsByUserId = async (req, res) => {
             "province",
             "subdistrict",
             "postal_code",
-            "no_hp",
+            "phone_number",
           ],
         },
         {
