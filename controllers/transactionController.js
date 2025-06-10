@@ -95,7 +95,10 @@ async function saveTransaction(req, res) {
 async function refundTransaction(req, res) {
   const { order_id } = req.params;
   const { amount, reason } = req.body;
-  const image = req.file?.path || req.body.image || null;
+
+  // Handle multiple image upload (from req.files)
+  const imagePaths =
+    req.files?.map((file) => `/uploads/${file.filename}`) || [];
 
   if (!order_id || !amount || !reason) {
     return res.status(400).json({
@@ -111,53 +114,29 @@ async function refundTransaction(req, res) {
       return res.status(404).json({ message: "Transaksi tidak ditemukan." });
     }
 
-    // ✅ Ambil user_id dari transaksi
     const user_id = transaction.buyer_id;
-
-    // ✅ Encode Midtrans server key
-    const base64ServerKey = Buffer.from(
-      `${process.env.MIDTRANS_SERVER_KEY}:`
-    ).toString("base64");
-
-    // ✅ Kirim permintaan refund ke Midtrans
-    const response = await axios.post(
-      `https://api.midtrans.com/v2/${order_id}/refund`,
-      { amount, reason },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${base64ServerKey}`,
-        },
-      }
-    );
-
-    await transaction.update({ status: "refunded" });
-    const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
-
     const refundData = await Refund.create({
       transaction_id: transaction.id,
       reason,
-      status: "refunded",
-      response: JSON.stringify(response.data),
-      image: imagePaths,
-      refunded_at: new Date(),
+      amount,
+      status: "requested", 
+      image: JSON.stringify(imagePaths),
     });
 
     return res.status(200).json({
-      message: "Refund berhasil diproses.",
+      message: "Permintaan refund berhasil diajukan.",
       refund: refundData,
       user_id,
-      midtrans_response: response.data,
     });
   } catch (error) {
-    console.error("Midtrans Refund Error:", error?.response?.data || error);
-
+    console.error("Refund Request Error:", error);
     return res.status(500).json({
-      message: "Refund gagal.",
-      error: error?.response?.data || error.message,
+      message: "Gagal mengajukan refund.",
+      error: error?.message || error,
     });
   }
 }
+
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
