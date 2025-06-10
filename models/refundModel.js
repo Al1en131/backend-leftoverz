@@ -31,6 +31,14 @@ const Refund = sequelize.define("Refund", {
     type: DataTypes.DATE,
     allowNull: true,
   },
+    tracking_number: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  courir: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,

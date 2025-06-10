@@ -119,7 +119,7 @@ async function refundTransaction(req, res) {
       transaction_id: transaction.id,
       reason,
       amount,
-      status: "requested", 
+      status: "requested",
       image: JSON.stringify(imagePaths),
     });
 
@@ -136,7 +136,28 @@ async function refundTransaction(req, res) {
     });
   }
 }
+const getRefundByTransactionId = async (req, res) => {
+  const { transaction_id } = req.params;
 
+  if (!transaction_id) {
+    return res.status(400).json({ message: "transaction_id diperlukan." });
+  }
+
+  try {
+    const refund = await Refund.findOne({
+      where: { transaction_id },
+    });
+
+    if (!refund) {
+      return res.status(404).json({ message: "Data refund tidak ditemukan." });
+    }
+
+    return res.status(200).json({ refund });
+  } catch (error) {
+    console.error("Error getRefundByTransactionId:", error);
+    return res.status(500).json({ message: "Terjadi kesalahan.", error });
+  }
+};
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
@@ -451,4 +472,5 @@ module.exports = {
   getTransactionByUserIdById,
   editTransactionByUserId,
   refundTransaction,
+  getRefundByTransactionId
 };

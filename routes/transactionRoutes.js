@@ -2,7 +2,7 @@ const express = require("express");
 const authMiddleware = require("../middlewares/authMiddleware"); 
 
 const routes = express.Router();
-const { getAllTransactions, getTransactionsByUserId, createMidtransToken, saveTransaction, handleMidtransWebhook, getTransactionByUserIdById, editTransactionByUserId, refundTransaction } = require("../controllers/transactionController");
+const { getAllTransactions, getTransactionsByUserId, createMidtransToken, saveTransaction, handleMidtransWebhook, getTransactionByUserIdById, editTransactionByUserId, refundTransaction, getRefundByTransactionId } = require("../controllers/transactionController");
 const { uploadMiddleware } = require("../controllers/productController");
 
 routes.get('/transactions/user/:userId', getTransactionsByUserId);
@@ -13,5 +13,6 @@ routes.post("/:order_id/refund", uploadMiddleware, refundTransaction);
 routes.post('/midtrans/webhook',handleMidtransWebhook);
 routes.get("/:userId/transaction/:transactionId", getTransactionByUserIdById);
 routes.put("/transactions/:id", editTransactionByUserId);
+routes.get("/refund/:transaction_id", getRefundByTransactionId);
 
 module.exports = routes;
