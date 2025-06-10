@@ -183,7 +183,7 @@ const updateShippingInfo = async (req, res) => {
 
     refund.tracking_number = tracking_number;
     refund.courir = courir;
-    refund.status = "refunded";
+    refund.status = "shipping";
     refund.refunded_at = new Date();
     await refund.save();
 
