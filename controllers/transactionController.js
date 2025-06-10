@@ -160,9 +160,9 @@ const getRefundByTransactionId = async (req, res) => {
 };
 const updateShippingInfo = async (req, res) => {
   const { id } = req.params;
-  const { tracking_number, courier } = req.body;
+  const { tracking_number, courir } = req.body;
 
-  if (!tracking_number || !courier) {
+  if (!tracking_number || !courir) {
     return res
       .status(400)
       .json({ message: "Tracking number dan courier harus diisi." });
@@ -182,7 +182,7 @@ const updateShippingInfo = async (req, res) => {
     }
 
     refund.tracking_number = tracking_number;
-    refund.courier = courier;
+    refund.courir = courir;
     refund.status = "refunded";
     refund.refunded_at = new Date();
     await refund.save();
