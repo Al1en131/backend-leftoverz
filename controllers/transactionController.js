@@ -158,6 +158,44 @@ const getRefundByTransactionId = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
+const updateShippingInfo = async (req, res) => {
+  const { id } = req.params;
+  const { tracking_number, courier } = req.body;
+
+  if (!tracking_number || !courier) {
+    return res
+      .status(400)
+      .json({ message: "Tracking number dan courier harus diisi." });
+  }
+
+  try {
+    const refund = await Refund.findByPk(id);
+
+    if (!refund) {
+      return res.status(404).json({ message: "Refund tidak ditemukan." });
+    }
+
+    if (refund.status !== "approved") {
+      return res
+        .status(400)
+        .json({ message: "Refund belum disetujui oleh admin." });
+    }
+
+    refund.tracking_number = tracking_number;
+    refund.courier = courier;
+    refund.status = "refunded";
+    refund.refunded_at = new Date();
+    await refund.save();
+
+    return res
+      .status(200)
+      .json({ message: "Data pengiriman berhasil disimpan.", refund });
+  } catch (error) {
+    console.error("Gagal update refund shipping:", error);
+    return res.status(500).json({ message: "Terjadi kesalahan server." });
+  }
+};
+
 const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.findAll({
@@ -472,5 +510,6 @@ module.exports = {
   getTransactionByUserIdById,
   editTransactionByUserId,
   refundTransaction,
-  getRefundByTransactionId
+  getRefundByTransactionId,
+  updateShippingInfo
 };
