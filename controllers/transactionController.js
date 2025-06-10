@@ -1,4 +1,5 @@
 const Transaction = require("../models/transactionModel");
+const Refund = require("../models/refundModel");
 const { User, Product } = require("../models");
 const midtransClient = require("midtrans-client");
 
@@ -77,25 +78,36 @@ async function saveTransaction(req, res) {
     res.status(500).json({ message: "Gagal menyimpan transaksi" });
   }
 }
+
 async function refundTransaction(req, res) {
   const { order_id } = req.params;
   const { amount, reason } = req.body;
+  const image = req.file?.path || req.body.image || null;
 
-  if (!order_id || !amount) {
-    return res.status(400).json({ message: "order_id dan amount diperlukan" });
+  if (!order_id || !amount || !reason) {
+    return res.status(400).json({
+      message: "order_id, amount, dan reason diperlukan.",
+    });
   }
 
   try {
-    const base64ServerKey = Buffer.from(
-      `${process.env.MIDTRANS_SERVER_KEY}:`
-    ).toString("base64");
+    // ✅ Cari transaksi berdasarkan order_id
+    const transaction = await Transaction.findOne({ where: { order_id } });
 
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaksi tidak ditemukan." });
+    }
+
+    // ✅ Ambil user_id dari transaksi
+    const user_id = transaction.buyer_id;
+
+    // ✅ Encode Midtrans server key
+    const base64ServerKey = Buffer.from(`${process.env.MIDTRANS_SERVER_KEY}:`).toString("base64");
+
+    // ✅ Kirim permintaan refund ke Midtrans
     const response = await axios.post(
-      `https://api.midtrans.com/v2/${order_id}/refund`, // Production endpoint
-      {
-        amount,
-        reason: reason || "Refund requested by user",
-      },
+      `https://api.midtrans.com/v2/${order_id}/refund`,
+      { amount, reason },
       {
         headers: {
           "Content-Type": "application/json",
@@ -104,17 +116,31 @@ async function refundTransaction(req, res) {
       }
     );
 
-    // Optionally update status in your DB
-    await Transaction.update({ status: "refunded" }, { where: { order_id } });
+    // ✅ Update status transaksi
+    await transaction.update({ status: "refunded" });
 
-    res.status(200).json({
-      message: "Refund berhasil diproses",
-      data: response.data,
+    // ✅ Simpan data refund ke database
+    const refundData = await Refund.create({
+      transaction_id: transaction.id,
+      reason,
+      status: "refunded",
+      response: JSON.stringify(response.data),
+      image: image || null,
+      refunded_at: new Date(),
     });
+
+    return res.status(200).json({
+      message: "Refund berhasil diproses.",
+      refund: refundData,
+      user_id,
+      midtrans_response: response.data,
+    });
+
   } catch (error) {
     console.error("Midtrans Refund Error:", error?.response?.data || error);
-    res.status(500).json({
-      message: "Refund gagal",
+
+    return res.status(500).json({
+      message: "Refund gagal.",
       error: error?.response?.data || error.message,
     });
   }
@@ -432,5 +458,5 @@ module.exports = {
   handleMidtransWebhook,
   getTransactionByUserIdById,
   editTransactionByUserId,
-  refundTransaction
+  refundTransaction,
 };

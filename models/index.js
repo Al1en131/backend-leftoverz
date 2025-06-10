@@ -3,6 +3,7 @@ const Product = require("./productModel");
 const Transaction = require("./transactionModel");
 const Chat = require("./chatModel");
 const Favorite = require("./favoriteModel");
+const Refund = require("./refundModel")
 
 const db = {
   User,
@@ -37,6 +38,14 @@ Favorite.associate = (models) => {
     as: "product", 
   });
 };
+
+Refund.associate = (models) => {
+  Refund.belongsTo(models.Transaction, {
+    foreignKey: "transaction_id",
+    as: "transaction"
+  });
+};
+
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
