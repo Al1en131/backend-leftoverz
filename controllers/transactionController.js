@@ -3,6 +3,18 @@ const Refund = require("../models/refundModel");
 const { User, Product } = require("../models");
 const axios = require("axios");
 const midtransClient = require("midtrans-client");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage }).array("image");
 
 const snap = new midtransClient.Snap({
   isProduction: true,
@@ -103,7 +115,9 @@ async function refundTransaction(req, res) {
     const user_id = transaction.buyer_id;
 
     // ✅ Encode Midtrans server key
-    const base64ServerKey = Buffer.from(`${process.env.MIDTRANS_SERVER_KEY}:`).toString("base64");
+    const base64ServerKey = Buffer.from(
+      `${process.env.MIDTRANS_SERVER_KEY}:`
+    ).toString("base64");
 
     // ✅ Kirim permintaan refund ke Midtrans
     const response = await axios.post(
@@ -117,16 +131,15 @@ async function refundTransaction(req, res) {
       }
     );
 
-    // ✅ Update status transaksi
     await transaction.update({ status: "refunded" });
+    const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
 
-    // ✅ Simpan data refund ke database
     const refundData = await Refund.create({
       transaction_id: transaction.id,
       reason,
       status: "refunded",
       response: JSON.stringify(response.data),
-      image: image || null,
+      image: imagePaths,
       refunded_at: new Date(),
     });
 
@@ -136,7 +149,6 @@ async function refundTransaction(req, res) {
       user_id,
       midtrans_response: response.data,
     });
-
   } catch (error) {
     console.error("Midtrans Refund Error:", error?.response?.data || error);
 
