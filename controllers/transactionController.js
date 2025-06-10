@@ -23,7 +23,7 @@ async function createMidtransToken(req, res) {
 
     console.log("Midtrans Snap Response:", transaction);
 
-    res.json({ token: transaction.token }); 
+    res.json({ token: transaction.token });
   } catch (error) {
     console.error("Midtrans Snap Error:", error);
 
@@ -147,7 +147,18 @@ const getTransactionsByUserId = async (req, res) => {
         {
           model: User,
           as: "buyer",
-          attributes: ["id", "name", "email"],
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "address",
+            "ward",
+            "regency",
+            "province",
+            "subdistrict",
+            "postal_code",
+            "no_hp",
+          ],
         },
         {
           model: User,
@@ -168,7 +179,18 @@ const getTransactionsByUserId = async (req, res) => {
         {
           model: User,
           as: "buyer",
-          attributes: ["id", "name", "email"],
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "address",
+            "ward",
+            "regency",
+            "province",
+            "subdistrict",
+            "postal_code",
+            "no_hp",
+          ],
         },
         {
           model: User,
@@ -234,7 +256,7 @@ const handleMidtransWebhook = async (req, res) => {
       if (fraud_status === "challenge") {
         transaction.status = "challenge";
       } else {
-        transaction.status = "success"; 
+        transaction.status = "success";
       }
     } else if (transaction_status === "pending") {
       transaction.status = "pending";
@@ -245,7 +267,7 @@ const handleMidtransWebhook = async (req, res) => {
     ) {
       transaction.status = "failed";
     } else {
-      transaction.status = transaction_status; 
+      transaction.status = transaction_status;
     }
 
     await transaction.save();
@@ -285,7 +307,7 @@ const getTransactionByUserIdById = async (req, res) => {
             "province",
             "regency",
             "subdistrict",
-            "postal_code"
+            "postal_code",
           ],
         },
         {
