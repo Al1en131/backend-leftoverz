@@ -184,12 +184,12 @@ const getAllRefundBySellerId = async (req, res) => {
             },
             {
               model: User,
-              as: "buyer", 
+              as: "buyer",
               attributes: ["name"],
             },
             {
               model: User,
-              as: "seller", 
+              as: "seller",
               attributes: ["name"],
             },
           ],
@@ -221,26 +221,31 @@ const getAllRefund = async (req, res) => {
           include: [
             {
               model: User,
-              as: 'buyer',
-              attributes: ['name'],
+              as: "buyer",
+              attributes: ["name"],
             },
             {
               model: User,
-              as: 'seller',
-              attributes: ['name'],
+              as: "seller",
+              attributes: ["name"],
             },
             {
               model: Product,
               as: "item",
-              attributes: ['name'],
+              attributes: ["name"],
             },
           ],
         },
       ],
       order: [["created_at", "DESC"]],
     });
-
-    return res.status(200).json({ refunds });
+    const result = refunds.map((refund) => ({
+      ...refund.toJSON(),
+      item: refund.Transaction?.item || null,
+      buyer: refund.Transaction?.buyer || null,
+      seller: refund.Transaction?.seller || null,
+    }));
+    return res.status(200).json({ result });
   } catch (error) {
     console.error("Error getAllRefund:", error);
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
@@ -270,7 +275,6 @@ const updateRefundStatus = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const updateShippingInfo = async (req, res) => {
   const { id } = req.params;
@@ -688,5 +692,5 @@ module.exports = {
   updateTransactionStatusPackage,
   getAllRefund,
   getAllRefundBySellerId,
-  updateRefundStatus
+  updateRefundStatus,
 };
