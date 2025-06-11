@@ -163,6 +163,45 @@ const getRefundByTransactionId = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
+const getRefundByUserId = async (req, res) => {
+  const { user_id } = req.params;
+
+  if (!user_id) {
+    return res.status(400).json({ message: "user_id diperlukan." });
+  }
+
+  try {
+    const refunds = await Refund.findAll({
+      include: [
+        {
+          model: Transaction,
+          where: { user_id },
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({ refunds });
+  } catch (error) {
+    console.error("Error getRefundByUserId:", error);
+    return res.status(500).json({ message: "Terjadi kesalahan.", error });
+  }
+};
+// controllers/refundController.js
+const getAllRefund = async (req, res) => {
+  try {
+    const refunds = await Refund.findAll({
+      include: [Transaction],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({ refunds });
+  } catch (error) {
+    console.error("Error getAllRefund:", error);
+    return res.status(500).json({ message: "Terjadi kesalahan.", error });
+  }
+};
+
 const updateShippingInfo = async (req, res) => {
   const { id } = req.params;
   const { tracking_number, courir } = req.body;
@@ -577,4 +616,6 @@ module.exports = {
   updateShippingInfo,
   updateShipping,
   updateTransactionStatusPackage,
+  getAllRefund,
+  getRefundByUserId,
 };
