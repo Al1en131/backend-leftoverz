@@ -252,7 +252,7 @@ const updateShipping = async (req, res) => {
       return res.status(404).json({ message: "Refund tidak ditemukan" });
     }
 
-    refund.status_package = status_package;
+    refund.status_package = "delivered";
     await refund.save();
 
     res.json({ message: "Status berhasil diperbarui", data: refund });
