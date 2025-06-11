@@ -184,12 +184,12 @@ const getAllRefundBySellerId = async (req, res) => {
             },
             {
               model: User,
-              as: "buyer_id",
+              as: "buyer", // ✅ Ganti ke alias yang benar
               attributes: ["name"],
             },
             {
               model: User,
-              as: "seller_id",
+              as: "seller", // ✅ Ganti ke alias yang benar
               attributes: ["name"],
             },
           ],
