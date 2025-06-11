@@ -242,6 +242,30 @@ const getAllRefund = async (req, res) => {
   }
 };
 
+const updateRefundStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+
+  try {
+    const refund = await Refund.findByPk(id);
+    if (!refund) {
+      return res.status(404).json({ message: "Refund not found" });
+    }
+
+    refund.status = status;
+    await refund.save();
+
+    return res.status(200).json({ message: "Refund status updated", refund });
+  } catch (error) {
+    console.error("Error updating refund status:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 const updateShippingInfo = async (req, res) => {
   const { id } = req.params;
@@ -659,4 +683,5 @@ module.exports = {
   updateTransactionStatusPackage,
   getAllRefund,
   getAllRefundBySellerId,
+  updateRefundStatus
 };

@@ -17,6 +17,7 @@ const {
   updateTransactionStatusPackage,
   getAllRefund,
   getAllRefundBySellerId,
+  updateRefundStatus,
 } = require("../controllers/transactionController");
 const { uploadMiddleware } = require("../controllers/productController");
 
@@ -34,5 +35,6 @@ routes.put("/:id/status-package", updateShipping);
 routes.put("/:id/transaction/status-package", updateTransactionStatusPackage);
 routes.get("/refunds", getAllRefund);
 routes.get("/seller/:seller_id/refund", getAllRefundBySellerId);
+routes.put("/refund/:id", updateRefundStatus);
 
 module.exports = routes;
