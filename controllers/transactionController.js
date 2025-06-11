@@ -270,6 +270,33 @@ const updateShipping = async (req, res) => {
   }
 };
 
+const updateTransactionStatusPackage = async (req, res) => {
+  const { id } = req.params;
+  const { status_package } = req.body;
+
+  try {
+    const transaction = await Transaction.findByPk(id);
+
+    if (!transaction) {
+      return res.status(404).json({ message: "transaction tidak ditemukan" });
+    }
+
+    transaction.status_package = status_package;
+    await transaction.save();
+
+    return res.status(200).json({
+      message: "Status berhasil diperbarui",
+      transaction, 
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Gagal memperbarui status",
+      error: err.message || err,
+    });
+  }
+};
+
 
 const countTransactions = async (req, res) => {
   try {
@@ -543,5 +570,6 @@ module.exports = {
   refundTransaction,
   getRefundByTransactionId,
   updateShippingInfo,
-  updateShipping
+  updateShipping,
+  updateTransactionStatusPackage
 };

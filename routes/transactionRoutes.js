@@ -2,7 +2,7 @@ const express = require("express");
 const authMiddleware = require("../middlewares/authMiddleware"); 
 
 const routes = express.Router();
-const { getAllTransactions, getTransactionsByUserId, createMidtransToken, saveTransaction, handleMidtransWebhook, getTransactionByUserIdById, editTransactionByUserId, refundTransaction, getRefundByTransactionId, updateShippingInfo, updateShipping } = require("../controllers/transactionController");
+const { getAllTransactions, getTransactionsByUserId, createMidtransToken, saveTransaction, handleMidtransWebhook, getTransactionByUserIdById, editTransactionByUserId, refundTransaction, getRefundByTransactionId, updateShippingInfo, updateShipping, updateTransactionStatusPackage } = require("../controllers/transactionController");
 const { uploadMiddleware } = require("../controllers/productController");
 
 routes.get('/transactions/user/:userId', getTransactionsByUserId);
@@ -16,6 +16,8 @@ routes.put("/transactions/:id", editTransactionByUserId);
 routes.get("/refund/:transaction_id", getRefundByTransactionId);
 routes.put("/refund/shipping/:id", updateShippingInfo);
 routes.put("/:id/status-package", updateShipping);
+routes.put("/:id/status-package", updateTransactionStatusPackage);
+
 
 
 module.exports = routes;
