@@ -176,17 +176,42 @@ const getRefundByUserId = async (req, res) => {
         {
           model: Transaction,
           where: { user_id },
+          include: [
+            {
+              model: Item,
+              attributes: ["name", "image", "price"],
+            },
+            {
+              model: User, // as buyer
+              as: "buyer",
+              attributes: ["name"],
+            },
+            {
+              model: User, // as seller
+              as: "seller",
+              attributes: ["name"],
+            },
+          ],
         },
       ],
       order: [["createdAt", "DESC"]],
     });
 
-    return res.status(200).json({ refunds });
+    // Mapping hasil supaya refund langsung punya item & buyer
+    const result = refunds.map((refund) => ({
+      ...refund.toJSON(),
+      item: refund.Transaction?.Item || null,
+      buyer: refund.Transaction?.buyer || null,
+      seller: refund.Transaction?.seller || null,
+    }));
+
+    return res.status(200).json({ refunds: result });
   } catch (error) {
     console.error("Error getRefundByUserId:", error);
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
+
 // controllers/refundController.js
 const getAllRefund = async (req, res) => {
   try {
