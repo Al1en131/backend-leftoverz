@@ -7,27 +7,23 @@ const path = require("path");
 
 const app = express();
 
-// ✅ CORS Setup untuk akses dari frontend kamu di Vercel
 app.use(cors({
-  origin: "https://leftoverz-production.up.railway.app/", // frontend domain
+  origin: "https://leftoverz-production.up.railway.app", 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 app.options("*", cors());
 
-// ✅ Middleware
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use(routes); // prefix route biar rapi
+app.use(routes); 
 
-// ✅ DB Connection
 sequelize
   .authenticate()
   .then(() => console.log("✅ Database connected"))
   .catch((err) => console.error("❌ Database connection error:", err));
 
-// ✅ Jalankan server (Railway akan otomatis gunakan PORT dari env)
 const PORT = process.env.PORT || 1031;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
