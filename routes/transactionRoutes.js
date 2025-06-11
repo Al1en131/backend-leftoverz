@@ -16,7 +16,7 @@ routes.put("/transactions/:id", editTransactionByUserId);
 routes.get("/refund/:transaction_id", getRefundByTransactionId);
 routes.put("/refund/shipping/:id", updateShippingInfo);
 routes.put("/:id/status-package", updateShipping);
-routes.put("/:id/status-package", updateTransactionStatusPackage);
+routes.put("/:id/transaction/status-package", updateTransactionStatusPackage);
 
 
 
