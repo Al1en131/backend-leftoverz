@@ -195,7 +195,7 @@ const getAllRefundBySellerId = async (req, res) => {
           ],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
 
     const result = refunds.map((refund) => ({
