@@ -179,6 +179,7 @@ const getAllRefundBySellerId = async (req, res) => {
           include: [
             {
               model: Product,
+              as: "item",
               attributes: ["name", "image", "price"],
             },
             {
