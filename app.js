@@ -9,7 +9,7 @@ const app = express();
 
 // ✅ CORS Setup untuk akses dari frontend kamu di Vercel
 app.use(cors({
-  origin: "https://leftoverz-app.vercel.app", // frontend domain
+  origin: "https://leftoverz-production.up.railway.app/", // frontend domain
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
