@@ -163,11 +163,11 @@ const getRefundByTransactionId = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
-const getRefundByUserId = async (req, res) => {
-  const { user_id } = req.params;
+const getAllRefundBySellerId = async (req, res) => {
+  const { seller_id } = req.params;
 
-  if (!user_id) {
-    return res.status(400).json({ message: "user_id diperlukan." });
+  if (!seller_id) {
+    return res.status(400).json({ message: "seller_id diperlukan." });
   }
 
   try {
@@ -175,19 +175,19 @@ const getRefundByUserId = async (req, res) => {
       include: [
         {
           model: Transaction,
-          where: { user_id },
+          where: { seller_id },
           include: [
             {
               model: Item,
               attributes: ["name", "image", "price"],
             },
             {
-              model: User, // as buyer
+              model: User,
               as: "buyer",
               attributes: ["name"],
             },
             {
-              model: User, // as seller
+              model: User,
               as: "seller",
               attributes: ["name"],
             },
@@ -197,7 +197,6 @@ const getRefundByUserId = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    // Mapping hasil supaya refund langsung punya item & buyer
     const result = refunds.map((refund) => ({
       ...refund.toJSON(),
       item: refund.Transaction?.Item || null,
@@ -207,7 +206,7 @@ const getRefundByUserId = async (req, res) => {
 
     return res.status(200).json({ refunds: result });
   } catch (error) {
-    console.error("Error getRefundByUserId:", error);
+    console.error("Error getAllRefundBySellerId:", error);
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
@@ -642,5 +641,5 @@ module.exports = {
   updateShipping,
   updateTransactionStatusPackage,
   getAllRefund,
-  getRefundByUserId,
+  getAllRefundBySellerId,
 };
