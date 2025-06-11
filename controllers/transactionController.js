@@ -546,6 +546,7 @@ const editTransactionByUserId = async (req, res) => {
 
     transaction.awb = awb;
     transaction.courir = courir;
+    transaction.status_package = "processed";
 
     await transaction.save();
 
