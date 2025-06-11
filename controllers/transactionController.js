@@ -200,7 +200,7 @@ const getAllRefundBySellerId = async (req, res) => {
 
     const result = refunds.map((refund) => ({
       ...refund.toJSON(),
-      item: refund.Transaction?.Item || null,
+      item: refund.Transaction?.item || null,
       buyer: refund.Transaction?.buyer || null,
       seller: refund.Transaction?.seller || null,
     }));
@@ -226,6 +226,7 @@ const getAllRefund = async (req, res) => {
             },
             {
               model: Product,
+              as: "item",
               attributes: ['name'],
             },
           ],
