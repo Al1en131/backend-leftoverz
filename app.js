@@ -8,7 +8,7 @@ const path = require("path");
 const app = express();
 
 app.use(cors({
-  origin: "https://leftoverz-production.up.railway.app", 
+  origin: "https://leftoverz-rosy.vercel.app", 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
