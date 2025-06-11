@@ -183,12 +183,12 @@ const getAllRefundBySellerId = async (req, res) => {
             },
             {
               model: User,
-              as: "buyer", // ✅ Ganti ke alias yang benar
+              as: "buyer", 
               attributes: ["name"],
             },
             {
               model: User,
-              as: "seller", // ✅ Ganti ke alias yang benar
+              as: "seller", 
               attributes: ["name"],
             },
           ],
@@ -211,11 +211,25 @@ const getAllRefundBySellerId = async (req, res) => {
   }
 };
 
-// controllers/refundController.js
 const getAllRefund = async (req, res) => {
   try {
     const refunds = await Refund.findAll({
-      include: [Transaction],
+      include: [
+        {
+          model: Transaction,
+          include: [
+            {
+              model: User,
+              as: 'buyer',
+              attributes: ['name'],
+            },
+            {
+              model: Product,
+              attributes: ['name'],
+            },
+          ],
+        },
+      ],
       order: [["created_at", "DESC"]],
     });
 
@@ -225,6 +239,7 @@ const getAllRefund = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan.", error });
   }
 };
+
 
 const updateShippingInfo = async (req, res) => {
   const { id } = req.params;
