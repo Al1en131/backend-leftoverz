@@ -42,6 +42,10 @@ const Transaction = sequelize.define(
       allowNull: true,
       defaultValue: "jne",
     },
+    status_package: {
+      type: DataTypes.ENUM("processed", "delivered"),
+      allowNull: true,
+    },
     awb: {
       type: DataTypes.STRING,
       allowNull: true,
