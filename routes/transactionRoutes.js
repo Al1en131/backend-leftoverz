@@ -15,5 +15,7 @@ routes.get("/:userId/transaction/:transactionId", getTransactionByUserIdById);
 routes.put("/transactions/:id", editTransactionByUserId);
 routes.get("/refund/:transaction_id", getRefundByTransactionId);
 routes.put("/refund/shipping/:id", updateShippingInfo);
+routes.put("/:id/status-package", updateShippingInfo);
+
 
 module.exports = routes;
