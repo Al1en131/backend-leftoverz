@@ -248,18 +248,28 @@ const updateShipping = async (req, res) => {
 
   try {
     const refund = await Refund.findByPk(id);
+
     if (!refund) {
       return res.status(404).json({ message: "Refund tidak ditemukan" });
     }
 
-    refund.status_package = "delivered";
+    // Gunakan data dari req.body, bukan hardcode
+    refund.status_package = status_package;
     await refund.save();
 
-    res.json({ message: "Status berhasil diperbarui", data: refund });
+    return res.status(200).json({
+      message: "Status berhasil diperbarui",
+      refund, // kirim sebagai 'refund' agar di frontend bisa pakai result.refund
+    });
   } catch (err) {
-    res.status(500).json({ message: "Gagal memperbarui status", error: err });
+    console.error(err);
+    return res.status(500).json({
+      message: "Gagal memperbarui status",
+      error: err.message || err,
+    });
   }
 };
+
 
 const countTransactions = async (req, res) => {
   try {
