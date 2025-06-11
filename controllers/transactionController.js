@@ -152,6 +152,11 @@ const getRefundByTransactionId = async (req, res) => {
       return res.status(404).json({ message: "Data refund tidak ditemukan." });
     }
 
+    await Transaction.update(
+      { status_package: "refund" },
+      { where: { id: transaction_id } }
+    );
+
     return res.status(200).json({ refund });
   } catch (error) {
     console.error("Error getRefundByTransactionId:", error);
@@ -286,7 +291,7 @@ const updateTransactionStatusPackage = async (req, res) => {
 
     return res.status(200).json({
       message: "Status berhasil diperbarui",
-      transaction, 
+      transaction,
     });
   } catch (err) {
     console.error(err);
@@ -296,7 +301,6 @@ const updateTransactionStatusPackage = async (req, res) => {
     });
   }
 };
-
 
 const countTransactions = async (req, res) => {
   try {
@@ -572,5 +576,5 @@ module.exports = {
   getRefundByTransactionId,
   updateShippingInfo,
   updateShipping,
-  updateTransactionStatusPackage
+  updateTransactionStatusPackage,
 };
