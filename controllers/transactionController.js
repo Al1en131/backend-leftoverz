@@ -225,6 +225,11 @@ const getAllRefund = async (req, res) => {
               attributes: ['name'],
             },
             {
+              model: User,
+              as: 'seller',
+              attributes: ['name'],
+            },
+            {
               model: Product,
               as: "item",
               attributes: ['name'],
