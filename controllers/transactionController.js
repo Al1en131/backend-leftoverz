@@ -179,7 +179,6 @@ const getAllRefundBySellerId = async (req, res) => {
           include: [
             {
               model: Product,
-              as: "item",
               attributes: ["name", "image", "price"],
             },
             {
@@ -217,7 +216,7 @@ const getAllRefund = async (req, res) => {
   try {
     const refunds = await Refund.findAll({
       include: [Transaction],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
 
     return res.status(200).json({ refunds });
