@@ -239,12 +239,15 @@ const getAllRefund = async (req, res) => {
       ],
       order: [["created_at", "DESC"]],
     });
+
     const result = refunds.map((refund) => ({
       ...refund.toJSON(),
       item: refund.Transaction?.item || null,
       buyer: refund.Transaction?.buyer || null,
       seller: refund.Transaction?.seller || null,
     }));
+
+    // ✅ Ubah 'result' menjadi 'refunds' agar cocok dengan frontend
     return res.status(200).json({ result });
   } catch (error) {
     console.error("Error getAllRefund:", error);
@@ -253,7 +256,7 @@ const getAllRefund = async (req, res) => {
 };
 
 const updateRefundStatus = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // ID refund, bukan ID transaksi
   const { status } = req.body;
 
   if (!status) {
@@ -266,8 +269,21 @@ const updateRefundStatus = async (req, res) => {
       return res.status(404).json({ message: "Refund not found" });
     }
 
+    // Ambil transaksi yang berhubungan dengan refund ini
+    const transaction = await Transaction.findByPk(refund.transaction_id);
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    // Update status refund
     refund.status = status;
     await refund.save();
+
+    // Jika status refund berubah ke "refunded", ubah juga status transaksi
+    if (status === "refunded") {
+      transaction.status = "refund";
+      await transaction.save();
+    }
 
     return res.status(200).json({ message: "Refund status updated", refund });
   } catch (error) {
