@@ -115,6 +115,7 @@ const getAllProducts = async (req, res) => {
         name: productJSON.User.name,
       };
       productJSON.user = {
+        province: productJSON.User.province,
         subdistrict: productJSON.User.subdistrict,
       };
       delete productJSON.User;
