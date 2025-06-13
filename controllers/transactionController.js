@@ -54,6 +54,7 @@ async function saveTransaction(req, res) {
       item_id,
       payment_method,
       status,
+      status_package,
       total,
       order_id,
     } = req.body;
@@ -63,6 +64,7 @@ async function saveTransaction(req, res) {
       !seller_id ||
       !item_id ||
       !payment_method ||
+      !status_package ||
       !status ||
       !total ||
       !order_id
@@ -75,6 +77,7 @@ async function saveTransaction(req, res) {
       seller_id,
       item_id,
       payment_method,
+      status_package,
       status,
       total,
       order_id,
@@ -679,7 +682,7 @@ const editTransactionByUserId = async (req, res) => {
 
     transaction.awb = awb;
     transaction.courir = courir;
-    transaction.status_package = "processed";
+    transaction.status_package = "shipping";
 
     await transaction.save();
 
