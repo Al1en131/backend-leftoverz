@@ -50,7 +50,7 @@ const User = sequelize.define(
       allowNull: true,
     },
     postal_code: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     address: {
